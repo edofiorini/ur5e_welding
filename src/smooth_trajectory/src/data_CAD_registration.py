@@ -1,37 +1,11 @@
 #!/usr/bin/env python3
 
 import numpy as np
-import teaserpp_python
 import open3d as o3d
 import copy
 from set_configuration import*
 
 
-def point_cloud_registration_TEASER(CAD_data, optitrack_data):
-	# Populate the parameters
-	solver_params = teaserpp_python.RobustRegistrationSolver.Params()
-	solver_params.cbar2 = 0.001
-	solver_params.noise_bound = 0.009
-	solver_params.estimate_scaling = True
-	solver_params.rotation_estimation_algorithm = (
-    	teaserpp_python.RobustRegistrationSolver.ROTATION_ESTIMATION_ALGORITHM.GNC_TLS
-	)
-	solver_params.rotation_gnc_factor = 1
-	solver_params.rotation_max_iterations = 100
-	solver_params.rotation_cost_threshold = 1e-90
-	print("TEASER++ Parameters are:", solver_params)
-
-	teaserpp_solver = teaserpp_python.RobustRegistrationSolver(solver_params)
-	solver = teaserpp_python.RobustRegistrationSolver(solver_params)
-	solver.solve(np.transpose(CAD_data), np.transpose(optitrack_data))
-
-	solution = solver.getSolution()
-	print("Solution is:",solution)
-	rotation = np.array(solution.rotation)
-	translation = np.array([[solution.translation[0]], [solution.translation[1]], [solution.translation[2]]])
-	CAD_data_transformed = np.matmul(rotation,np.transpose(CAD_data)) + translation
-	
-	return np.transpose(CAD_data_transformed)
 
 def draw_registration_result(source, target, transformation):
     source_temp = copy.deepcopy(source)

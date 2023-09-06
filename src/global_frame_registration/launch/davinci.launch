@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="global_frame" default="/world" />
+    <arg name="tool_points" default="3" />
+    <arg name="load_reference" default="true" />
+
+    <!-- Lenght of the adapter attached on the tip of EGS -->
+    <arg name="adapter_len" default="0.15" />
+
+    <node pkg="global_frame_registration" type="adapter_pose_publisher" name="adapter_pose_publisher" output="screen" unless="$(arg load_reference)">
+        <param name="adapter_len" value="$(arg adapter_len)"/>
+    </node>
+
+    <!-- <node pkg="tf" type="static_transform_publisher" name="endoscope_left_camera_publisher" args="-0.017 -0.002 -0.011 -0.037 0.119 -0.189 0.974 /ECM /endoscope/left_camera 10"/> -->
+    <node pkg="tf" type="static_transform_publisher" name="handeye_left" output="screen" args="0.0024 -0.0000 0.0032 -0.0000 0.0002 0.0005 1.0000 /ECM /endoscope/left_camera 10"/>
+
+    <node pkg="global_frame_registration" name="global_frame_registration" type="global_frame_registration" required="true" output="screen">
+        <rosparam>
+        tool_subscribers: [/dvrk/PSM1/position_cartesian_current]
+        camera_subscribers: []
+        registrations:
+        - frame_id: PSM1_base
+          orientation: [-0.026551246570774092, 0.08485782926048359, 0.6079305581061705, 0.7889959547674859]
+          parent_frame: /world
+          position: [-0.002411403361282736, -0.10123628312118113, 0.16578721402378868]
+        </rosparam>
+        <param name="global_frame_name" type="string" value="$(arg global_frame)" />
+        <param name="num_points" type="int" value="$(arg tool_points)" />
+        <param name="use_existing" type="bool" value="$(arg load_reference)" />
+    </node>
+
+
+</launch>

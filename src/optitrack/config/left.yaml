@@ -1,0 +1,12 @@
+header:
+    frame_id: "left_tool"
+pose:
+    position:
+        x: -0.220006
+        y: -0.209869
+        z: 0.1368
+    orientation:
+        x: 0.134526
+        y: -0.535538
+        z: 0.121478
+        w: 0.824831

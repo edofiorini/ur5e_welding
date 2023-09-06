@@ -1,0 +1,62 @@
+<launch>
+  <!-- rosrun tf tf_echo ECM camera_color_optical_frame -->
+  <!-- <node pkg="tf" name="connecting_realsense" type="static_transform_publisher" args="0.015 0.000 0.000 0.504 -0.496 0.501 0.498 camera_color_optical_frame camera_link 10"/> -->
+  <!-- <node pkg="tf" type="static_transform_publisher" name="handeye_left" output="screen" args="0.0024 -0.0000 0.0032 -0.0000 0.0002 0.0005 1.0000 /ECM /endoscope/left_camera 10"/> -->
+
+
+  <!-- <node pkg="tf" name="rs2ecm" type="static_transform_publisher" args="-0.033 0.016 -0.038 0.009 -0.008 0.030 0.999 ECM camera_color_optical_frame 10"/> -->
+  <arg name="global_frame" default="/world"/>
+  <arg name="tool_points" default="3"/>
+  <arg name="load_reference" default="false"/>
+
+
+  <!-- Lenght of the adapter attached on the tip of EGS-->
+  <arg name="adapter_len" default="0.15" />
+  <node pkg="global_frame_registration" type="adapter_pose_publisher" name="adapter_pose_publisher" output="screen" unless="$(arg load_reference)">
+    <param name="adapter_len" value="$(arg adapter_len)"/>
+  </node>
+
+  <!-- /dvrk/ECM/adapter_position, /pointPose, /dvrk/PSM1/position_cartesian_current -->
+  <node pkg="global_frame_registration" name="global_frame_registration" type="global_frame_registration" required="true" output="screen">
+    <rosparam>
+        tool_subscribers: [/dvrk/ECM/adapter_position]
+        rgbd_subscribers: [/realsense_pose_array]
+        camera_subscribers: []
+        registrations:
+        - frame_id: camera_color_optical_frame
+          orientation: [-0.02669944721950485, -0.0035701155898253786, 0.024020340126140474, 0.9993484962979996]
+          parent_frame: ECM
+          position: [-0.03343801327703206, 0.011235974201557699, -0.036093189719130295]
+        - frame_id: ECM_base
+          orientation: [-0.3147582430061286, -0.2789816775608017, 0.5868687284634998, 0.6918681721229057]
+          parent_frame: /world
+          position: [-0.1476897564286004, -0.0013226513097707414, 0.2542693798253021]
+    </rosparam>
+
+
+    <param name="global_frame_name" type="string" value="$(arg global_frame)"/>
+    <param name="num_points" type="int" value="$(arg tool_points)"/>
+    <param name="use_existing" type="bool" value="$(arg load_reference)"/>
+    <param name="eye_in_hand" type="bool" value="true"/>
+    <param name="camera_color_frame" value="camera_color_optical_frame"/>
+    <param name="camera_ref_frame" value="ECM"/>
+    <param name="camera_ref_base_frame" value="ECM_base"/>
+  </node>
+</launch>
+
+
+<!--
+  standard with realsense_pointArray
+  -0.043 0.024 -0.044 -0.060 -0.034 0.008 0.998
+
+- frame_id: camera_color_optical_frame
+  orientation: [-0.5865315401445371, 0.7711434339664909, -0.14690286161599517, 0.19934418956939123]
+  parent_frame: /world
+  position: [-0.10382817548495776, 0.035329291020626305, 0.18248991857093716]
+- frame_id: ECM_base
+  orientation: [-0.2992671703589867, -0.27298704839753896, 0.5883483497654878, 0.6998310163752048]
+  parent_frame: /world
+  position: [-0.14029244642078056, -0.004880959941992613, 0.25874472267211357]
+
+
+-->

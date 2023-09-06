@@ -1,0 +1,20 @@
+<launch>
+
+    <node name="board_rec" pkg="global_frame_registration" type="board_rec" args="" respawn="false" output="screen">
+        <param name = "tof_3d" type="bool" value="false"/>
+        <!-- real sense -->
+        <param name = "color_camera" type="string" value="/camera/color/image_rect_color"/>
+        <param name = "depth_camera" type="string" value="/camera/aligned_depth_to_color/image_raw"/>
+        <param name = "cam_info" type="string" value="/camera/color/camera_info"/>
+        <param name = "radius" type="int" value="25"/>
+
+        <!-- endoscope 3d  : problem with size of depth image != from size of color image 
+        <param name = "color_camera" type="string" value="endoscope/right/image_raw"/>
+        <param name = "depth_camera" type="string" value="endoscope/depth_image"/>
+        <param name = "cam_info" type="string" value="endoscope/right/camera_info"/>
+        -->
+        
+        <param name = "pose_array" type="string" value="/realsense_pose_array"/>
+    </node>
+
+</launch>

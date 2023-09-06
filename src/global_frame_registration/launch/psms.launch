@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="global_frame" default="/world" />
+  <arg name="tool_points" default="3" />
+  <arg name="load_reference" default="true" />
+
+    <!-- Lenght of the adapter attached on the tip of EGS -->
+    <arg name="adapter_len" default="0.15" />
+
+    <node pkg="global_frame_registration" type="adapter_pose_publisher" name="adapter_pose_publisher" output="screen" unless="$(arg load_reference)">
+        <param name="adapter_len" value="$(arg adapter_len)"/>
+    </node>
+
+  <!-- <include file="$(find easy_handeye)/launch/publish.launch">
+    <arg name="namespace_prefix" value="left_camera" />
+    <arg name="eye_on_hand" value="false" />
+  </include> -->
+
+  <node pkg="global_frame_registration" name="global_frame_registration" type="global_frame_registration" required="true" output="screen">
+    <rosparam>
+        tool_subscribers: [/dvrk/PSM2/position_cartesian_current, /dvrk/PSM1/position_cartesian_current, /dvrk/ECM/adapter_position]
+        camera_subscribers: []
+        registrations:
+        - frame_id: PSM1_base
+          orientation: [0.0047607692863967845, -0.056345781615230094, 0.5714539575743709, 0.8186836155332288]
+          parent_frame: /world
+          position: [-0.01627030709497425, -0.10388102167351732, 0.12791901200919736]
+        - frame_id: mesa_right/sbs_world
+          orientation: [0.08086823560146714, -0.03368310535565008, 0.7219394533075552, 0.6863885216422942]
+          parent_frame: /world
+          position: [-0.09384934363786403, -0.2824900453046865, -0.7512035362827691]
+        </rosparam>
+    <param name="global_frame_name" type="string" value="$(arg global_frame)" />
+    <param name="num_points" type="int" value="$(arg tool_points)" />
+    <param name="use_existing" type="bool" value="$(arg load_reference)" />
+  </node>
+
+</launch>

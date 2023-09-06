@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="global_frame" default="/world" />
+    <arg name="tool_points" default="3" />
+    <arg name="load_reference" default="false" />
+
+    <!-- Lenght of the adapter attached on the tip of EGS -->
+    <arg name="adapter_len" default="0.15" />
+
+    <node pkg="global_frame_registration" type="adapter_pose_publisher" name="adapter_pose_publisher" output="screen" unless="$(arg load_reference)">
+        <param name="adapter_len" value="$(arg adapter_len)"/>
+    </node>
+
+    <include file="$(find global_frame_registration)/launch/board_recognition.launch" />
+
+    <node pkg="global_frame_registration" name="global_frame_registration" type="global_frame_registration" required="true" output="screen">
+        <param name="global_frame_name" type="string" value="$(arg global_frame)" />
+        <param name="num_points" type="int" value="$(arg tool_points)" />
+        <param name="use_existing" type="bool" value="$(arg load_reference)" />
+        <param name="eye_in_hand" type="bool" value="false"/>
+        <param name="camera_color_frame" value="camera_color_optical_frame"/>
+        <param name="camera_ref_frame" value="ECM"/>
+        <param name="camera_ref_base_frame" value="ECM_base"/>
+
+        <rosparam>
+        rgbd_subscribers: [/realsense_pose_array]
+        tool_subscribers: [/mesa_left/ee_pose, /dvrk/ECM/adapter_position, /dvrk/PSM1/position_cartesian_current, /dvrk/PSM2/position_cartesian_current]
+        camera_subscribers: []
+        <!-- CAMERA ON ECM [FIXED WEIRD ROTATION AROUND Z] -->
+        registrations:
+        - frame_id: camera_color_optical_frame
+          orientation: [-0.014385121012071681, 0.0031155439724009364, 0.01250731735721503, 0.9998134469448539]
+          parent_frame: ECM
+          position: [-0.03883645904653484, 0.0155049900388996, -0.0323448433778559]
+        - frame_id: /mesa_left/panda_link0
+          orientation: [-0.2743478635453576, 0.27983597506359525, -0.6491018630278178, 0.651990681100674]
+          parent_frame: /world
+          position: [-0.4151578600707353, 0.7204756059779349, 0.0978037253305043]
+        - frame_id: PSM1_base
+          orientation: [0.24597473464156347, 0.16080166533117085, 0.34266353633353247, 0.8923121400116287]
+          parent_frame: /world
+          position: [0.11153685173468789, -0.10272320575734278, 0.07216316094698129]
+        - frame_id: ECM_base
+          orientation: [-0.020003871065457656, -0.018431312700499684, 0.6831205774949559, 0.7297988821980278]
+          parent_frame: /world
+          position: [0.01247034180649954, -0.005379605505587556, 0.28591110268130276]
+        - frame_id: PSM2_base
+          orientation: [0.22876759462955887, 0.2410922564917684, 0.8313450900973061, 0.445427045292734]
+          parent_frame: /world
+          position: [0.11122306138655366, 0.09298528729968383, 0.06522401879330485]
+      </rosparam>
+    </node>
+
+    <!-- At time 1619686069.941
+    - Translation: [0.088, -0.006, -0.021]
+    - Rotation: in Quaternion [-0.394, 0.297, -0.633, 0.596]
+                in RPY (radian) [-1.026, -0.145, -1.549]
+                in RPY (degree) [-58.777, -8.315, -88.756] -->
+</launch>

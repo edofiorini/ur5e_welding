@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="global_frame" default="/world" />
+    <arg name="tool_points" default="3" />
+    <arg name="load_reference" default="false" />
+
+    <!-- MESA_RIGHT HAND-EYE CALIB -->
+    <node pkg="tf" type="static_transform_publisher" name="handeye_right" output="screen" args="-0.0104771784834 -0.00687407008422 0.452222667811  0.0307522403859 0.00651401321488 -0.0724336496688 0.996877742624 /mesa_left/panda_link8 /endoscope/right_camera 10"/>
+    <!-- LEFT TROCAR WRT WORLD 1 CALIB! (FROM DIMA CAD) -->
+    <node pkg="tf" type="static_transform_publisher" name="left_trocar" output="screen" args="0.011 0.054 0.0033 1.570796327 0 0 /world /surgeon/left/rcm 10"/>
+    <!-- RIGHT TROCAR WRT WORLD 1 CALIB! (FROM DIMA CAD) -->
+    <node pkg="tf" type="static_transform_publisher" name="right_trocar" output="screen" args="0.011 -0.055 0.0033 -1.570796327 0 0 /world /surgeon/right/rcm 10"/>
+
+    <node pkg="global_frame_registration" name="global_frame_registration" type="global_frame_registration" required="true" output="screen">
+        <rosparam>
+        tool_subscribers: [/mesa_right/ee_pose]
+        camera_subscribers: []
+        rgbd_subscribers: []
+        registrations:
+        - frame_id: /mesa_right/panda_link0
+          orientation: [0.18942735284805753, 0.4305453088393202, 0.3423145659813434, 0.8133687681159367]
+          parent_frame: /world
+          position: [-0.17403207925785658, -0.6292039756186394, -0.1624034150518452]
+        </rosparam>
+        <param name="global_frame_name" type="string" value="$(arg global_frame)" />
+        <param name="num_points" type="int" value="$(arg tool_points)" />
+        <param name="use_existing" type="bool" value="$(arg load_reference)" />
+    </node>
+
+</launch>

@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="global_frame" default="/world" />
+    <arg name="tool_points" default="3" />
+    <arg name="load_reference" default="false" />
+
+    <!-- MESA_RIGHT HAND-EYE CALIB -->
+    <!-- <node pkg="tf" type="static_transform_publisher" name="handeye_right" output="screen" args="-0.0104771784834 -0.00687407008422 0.452222667811  0.0307522403859 0.00651401321488 -0.0724336496688 0.996877742624 /mesa_right/panda_link8 /endoscope/right_camera 10"/> -->
+
+    <node pkg="global_frame_registration" name="global_frame_registration" type="global_frame_registration" required="true" output="screen">
+        <rosparam>
+        tool_subscribers: [/mesa_left/ee_pose, /mesa_right/ee_pose, /surgeon/right_tool/pose]
+        camera_subscribers: []
+        rgbd_subscribers: []
+        camera_color_frame: ""
+        camera_ref_frame: ""
+        camera_ref_base_frame: ""
+        eye_in_hand: false
+        registrations:
+        - frame_id: optitrack_world
+          orientation: [0.2500676466612965, 0.6630294966999236, 0.6523746815967405, 0.2688221222494133]
+          parent_frame: /world
+          position: [0.24780960888971076, -0.07766405742564843, -0.01673019968623776]
+        - frame_id: /mesa_right/panda_link0
+          orientation: [-0.003991153660917504, -0.013761029614610341, -0.37550712939345315, 0.9267087463335443]
+          parent_frame: /world
+          position: [0.1147588148886818, 0.4995699706186045, 0.015328497884902922]
+        - frame_id: /mesa_left/panda_link0
+          orientation: [-0.028298533917342317, -0.003665211271473441, 0.37866056000523945, 0.9250956380293786]
+          parent_frame: /world
+          position: [0.1900707046529986, -0.7234477287473376, 0.056122064435206065]
+        </rosparam>
+        <param name="global_frame_name" type="string" value="$(arg global_frame)" />
+        <param name="num_points" type="int" value="$(arg tool_points)" />
+        <param name="use_existing" type="bool" value="$(arg load_reference)" />
+    </node>
+
+</launch>

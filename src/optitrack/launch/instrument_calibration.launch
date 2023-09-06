@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="side" default="left"/>
+    
+    <arg name="optitrack_ref_frame" default="optitrack_world"/>
+    <arg name="optitrack_tool_frame" default="$(arg side)_tool"/>
+    <arg name="tool_base_frame" default="base_calib"/>
+    <arg name="rate" default="100"/>
+    <arg name="ns" default="$(arg side)"/>
+    <arg name="output_file" default="$(find optitrack)/config/$(arg ns).yaml"/>
+
+    <include file="$(find optitrack)/launch/vrpn_client.launch" />
+
+    <node pkg="optitrack" type="instrument_calibration" name="instrument_calibration" output="screen">
+        <param name="optitrack_ref_frame" value="$(arg optitrack_ref_frame)"/>
+        <param name="optitrack_tool_frame" value="$(arg optitrack_tool_frame)"/>
+        <param name="tool_base_frame" value="$(arg tool_base_frame)"/>
+        <param name="rate" value="$(arg rate)"/>
+        <param name="ns" value="$(arg ns)"/>
+        <param name="output_file" value="$(arg output_file)"/>
+    </node>
+
+</launch>

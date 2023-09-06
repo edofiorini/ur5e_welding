@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="global_frame" default="/world" />
+    <arg name="tool_points" default="3" />
+    <arg name="load_reference" default="false" />
+
+    <!-- Lenght of the adapter attached on the tip of EGS -->
+    <arg name="adapter_len" default="0.15" />
+
+    <node pkg="global_frame_registration" type="adapter_pose_publisher" name="adapter_pose_publisher" output="screen" unless="$(arg load_reference)">
+        <param name="adapter_len" value="$(arg adapter_len)"/>
+    </node>
+
+    <include file="$(find global_frame_registration)/launch/board_recognition.launch" />
+
+    <node pkg="global_frame_registration" name="global_frame_registration" type="global_frame_registration" required="true" output="screen">
+        <param name="global_frame_name" type="string" value="$(arg global_frame)" />
+        <param name="num_points" type="int" value="$(arg tool_points)" />
+        <param name="use_existing" type="bool" value="$(arg load_reference)" />
+        <param name="eye_in_hand" type="bool" value="true"/>
+        <param name="camera_color_frame" value="camera_color_optical_frame"/>
+        <param name="camera_ref_frame" value="ECM"/>
+        <param name="camera_ref_base_frame" value="ECM_base"/>
+
+        <rosparam>
+        rgbd_subscribers: [/realsense_pose_array]
+        tool_subscribers: [/dvrk/PSM2/position_cartesian_current, /dvrk/ECM/adapter_position]
+        camera_subscribers: []
+        registrations:
+        - frame_id: camera_color_optical_frame
+          orientation: [-0.004777242661150873, -0.004367779981941251, -0.0787864504455543, 0.9968705009562557]
+          parent_frame: ECM
+          position: [-0.02903738971389976, 0.025619929754195803, -0.031011830825562244]
+        - frame_id: PSM2_base
+          orientation: [0.3766243358366124, 0.19609353520916328, 0.8185753952217627, 0.38682781368761243]
+          parent_frame: /world
+          position: [0.14262197665496829, 0.09915729701032737, 0.07961065260554215]
+        - frame_id: ECM_base
+          orientation: [-0.02104980481810013, 0.0607487916977351, 0.6508615542704328, 0.7564692506619561]
+          parent_frame: /world
+          position: [0.05079702405200379, 0.0034654359061689483, 0.3708625159480406]
+        </rosparam>
+    </node>
+
+
+</launch>

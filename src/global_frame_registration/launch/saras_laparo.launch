@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="global_frame" default="/world" />
+    <arg name="tool_points" default="3" />
+    <arg name="load_reference" default="false" />
+
+    <!-- MESA_RIGHT HAND-EYE CALIB -->
+    <node pkg="tf" type="static_transform_publisher" name="handeye_right" output="screen" args="-0.0104771784834 -0.00687407008422 0.452222667811  0.0307522403859 0.00651401321488 -0.0724336496688 0.996877742624 /mesa_left/panda_link8 /endoscope/right_camera 10"/>
+
+    <node pkg="global_frame_registration" name="global_frame_registration" type="global_frame_registration" required="true" output="screen">
+        <rosparam>
+        tool_subscribers: [/mesa_right/ee_pose]
+        camera_subscribers: []
+        rgbd_subscribers: []
+        registrations:
+        - frame_id: /mesa_right/panda_link0
+          orientation: [0.18863779578179524, 0.44157073666718805, 0.34424025397305763, 0.8068021529881705]
+          parent_frame: /world
+          position: [-0.16988239006155537, -0.6365298258001878, -0.15647425768245157]
+        </rosparam>
+        <param name="global_frame_name" type="string" value="$(arg global_frame)" />
+        <param name="num_points" type="int" value="$(arg tool_points)" />
+        <param name="use_existing" type="bool" value="$(arg load_reference)" />
+    </node>
+
+</launch>
