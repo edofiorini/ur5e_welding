@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="limited" default="false" doc="If true, limits joint range [-PI, PI] on all joints." />
+  <arg name="transmission_hw_interface" default="hardware_interface/PositionJointInterface" />
+  <arg name="kinematics_config" default="$(find ur_ros)/config/ur10_default.yaml"/>
+
+  <arg name="robot_ip" default="localhost" />
+  <arg name="robot_ns" default="ur" />
+  <arg name="freq" default="100" />
+  <arg name="urcap_port" default="50002" />
+
+  <param unless="$(arg limited)" name="robot_description" command="$(find xacro)/xacro --inorder '$(find ur_ros)/urdf/ur10_robot.urdf.xacro'
+    transmission_hw_interface:=$(arg transmission_hw_interface)
+    kinematics_config:=$(arg kinematics_config)" />
+  <param if="$(arg limited)" name="robot_description" command="$(find xacro)/xacro --inorder '$(find ur_ros)/urdf/ur10_joint_limited_robot.urdf.xacro'
+    transmission_hw_interface:=$(arg transmission_hw_interface)
+    kinematics_config:=$(arg kinematics_config)" />
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <param name="tf_prefix" value="$(arg robot_ns)"/>
+  </node>
+  
+  <node name="ur_rtde" pkg="ur_ros" type="ur_ros_node">
+    <param name="robot_ip" value="$(arg robot_ip)"/>
+    <param name="robot_ns" value="$(arg robot_ns)"/>
+    <param name="freq" value="$(arg freq)"/>
+    <param name="urcap_port" value="$(arg urcap_port)"/>    
+  </node>
+</launch>

@@ -1,0 +1,6 @@
+Time,header.seq,header.stamp.secs,header.stamp.nsecs,header.frame_id,level,name,msg,file,function,line,topics
+1665652649.285755,3,1665652649,279032224,,2,/record_1665652649265872487,Subscribing to /rosout,/tmp/binarydeb/ros-kinetic-rosbag-1.12.14/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,212,['/rosout']
+1665652649.2857738,4,1665652649,280749257,,2,/record_1665652649265872487,Subscribing to /tf,/tmp/binarydeb/ros-kinetic-rosbag-1.12.14/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,212,['/rosout']
+1665652649.2857776,5,1665652649,282430396,,2,/record_1665652649265872487,Subscribing to /rosout_agg,/tmp/binarydeb/ros-kinetic-rosbag-1.12.14/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,212,['/rosout']
+1665652649.2857792,6,1665652649,284036953,,2,/record_1665652649265872487,Subscribing to /vrpn_client_node/left_tool/pose,/tmp/binarydeb/ros-kinetic-rosbag-1.12.14/src/recorder.cpp,shared_ptr<ros::Subscriber> rosbag::Recorder::subscribe,212,['/rosout']
+1665652649.5375867,5,1665650648,332987987,,2,/vrpn_client_node,Creating new tracker left_tool,/tmp/binarydeb/ros-kinetic-vrpn-client-ros-0.2.2/src/vrpn_client_ros.cpp,VrpnTrackerRos::init,94,['/rosout']

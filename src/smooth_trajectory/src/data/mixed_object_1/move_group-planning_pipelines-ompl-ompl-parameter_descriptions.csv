@@ -1,0 +1,61 @@
+Time,groups,max.bools,max.ints,max.strs,max.doubles,max.groups,min.bools,min.ints,min.strs,min.doubles,min.groups,dflt.bools,dflt.ints,dflt.strs,dflt.doubles,dflt.groups
+1671120606.884729,"[name: ""Default""
+type: ''
+parameters: 
+  - 
+    name: ""simplify_solutions""
+    type: ""bool""
+    level: 0
+    description: ""Flag indicating whether computed motion plans are also simplified""
+    edit_method: ''
+  - 
+    name: ""minimum_waypoint_count""
+    type: ""int""
+    level: 0
+    description: ""Set the minimum number of waypoints to include in a motion plan""
+    edit_method: ''
+  - 
+    name: ""maximum_waypoint_distance""
+    type: ""double""
+    level: 0
+    description: ""The maximum distance between consecutive waypoints along the solution path (0.0 means\
+  \ 'ignore')""
+    edit_method: ''
+  - 
+    name: ""link_for_exploration_tree""
+    type: ""str""
+    level: 0
+    description: ""Show the exploration tree for a particular link""
+    edit_method: ''
+  - 
+    name: ""display_random_valid_states""
+    type: ""bool""
+    level: 0
+    description: ""Flag indicating whether random valid states are to be published""
+    edit_method: ''
+parent: 0
+id: 0]","[name: ""simplify_solutions""
+value: True, name: ""display_random_valid_states""
+value: True]","[name: ""minimum_waypoint_count""
+value: 10000]","[name: ""link_for_exploration_tree""
+value: '']","[name: ""maximum_waypoint_distance""
+value: 50.0]","[name: ""Default""
+state: True
+id: 0
+parent: 0]","[name: ""simplify_solutions""
+value: False, name: ""display_random_valid_states""
+value: False]","[name: ""minimum_waypoint_count""
+value: 2]","[name: ""link_for_exploration_tree""
+value: '']","[name: ""maximum_waypoint_distance""
+value: 0.0]","[name: ""Default""
+state: True
+id: 0
+parent: 0]","[name: ""simplify_solutions""
+value: True, name: ""display_random_valid_states""
+value: False]","[name: ""minimum_waypoint_count""
+value: 2]","[name: ""link_for_exploration_tree""
+value: '']","[name: ""maximum_waypoint_distance""
+value: 0.0]","[name: ""Default""
+state: True
+id: 0
+parent: 0]"

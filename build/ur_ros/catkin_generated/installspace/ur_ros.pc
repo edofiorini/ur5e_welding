@@ -1,0 +1,8 @@
+prefix=/home/edoardo/ur5e_welding/install
+
+Name: ur_ros
+Description: Description of ur_ros
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: 

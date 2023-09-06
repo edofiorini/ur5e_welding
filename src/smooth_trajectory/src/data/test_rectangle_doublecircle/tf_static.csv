@@ -1,0 +1,243 @@
+Time,transforms
+1671701202.778584,"[header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 471494511
+  frame_id: ""world""
+child_frame_id: ""panda_link0""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0]"
+1671701202.7789226,"[header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539582726
+  frame_id: ""panda_hand_tcp""
+child_frame_id: ""panda_base_weldingpointer""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539595443
+  frame_id: ""panda_base_weldingpointer""
+child_frame_id: ""panda_weldingpointer""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.09
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539598494
+  frame_id: ""panda_link8""
+child_frame_id: ""panda_hand""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: -0.38268343236508984
+    w: 0.9238795325112867, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539600670
+  frame_id: ""panda_hand""
+child_frame_id: ""panda_hand_sc""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539601467
+  frame_id: ""panda_hand""
+child_frame_id: ""panda_hand_tcp""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.1034
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539603622
+  frame_id: ""panda_link7""
+child_frame_id: ""panda_link8""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.107
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539605151
+  frame_id: ""panda_link0""
+child_frame_id: ""panda_link0_sc""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539605858
+  frame_id: ""panda_link1""
+child_frame_id: ""panda_link1_sc""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539606400
+  frame_id: ""panda_link2""
+child_frame_id: ""panda_link2_sc""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539608520
+  frame_id: ""panda_link3""
+child_frame_id: ""panda_link3_sc""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539609065
+  frame_id: ""panda_link4""
+child_frame_id: ""panda_link4_sc""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539609672
+  frame_id: ""panda_link5""
+child_frame_id: ""panda_link5_sc""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539610227
+  frame_id: ""panda_link6""
+child_frame_id: ""panda_link6_sc""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0, header: 
+  seq: 0
+  stamp: 
+    secs: 1671700422
+    nsecs: 539610760
+  frame_id: ""panda_link7""
+child_frame_id: ""panda_link7_sc""
+transform: 
+  translation: 
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation: 
+    x: 0.0
+    y: 0.0
+    z: 0.38268343236508984
+    w: 0.9238795325112867]"

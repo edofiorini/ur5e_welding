@@ -1,0 +1,8 @@
+## optitrack acquisitions 
+
+prova_2 --> random
+test_pointer_0 / test_pointer_3 --> B3  
+test_rectangle -->  29,7 cm, 21 cm test_rectangle_1 better
+test_circle --> diameter 7,7 cm
+test_rectangle_circle --> 10 cm, diameter 12, 12 cm
+test_box --> 11.7 cm, 10.5 cm, volume: 5.6 cm 

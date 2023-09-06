@@ -1,0 +1,10 @@
+Time,bools,ints,strs,doubles,groups
+1671701202.777707,"[name: ""simplify_solutions""
+value: True, name: ""display_random_valid_states""
+value: False]","[name: ""minimum_waypoint_count""
+value: 2]","[name: ""link_for_exploration_tree""
+value: '']","[name: ""maximum_waypoint_distance""
+value: 0.0]","[name: ""Default""
+state: True
+id: 0
+parent: 0]"

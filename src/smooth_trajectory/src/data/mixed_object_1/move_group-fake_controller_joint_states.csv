@@ -1,0 +1,2 @@
+Time,header.seq,header.stamp.secs,header.stamp.nsecs,header.frame_id,name,position_0,position_1,position_2,position_3,position_4,position_5,position_6
+1671120606.9950829,0,1671119612,39958431,,"['panda_joint1', 'panda_joint2', 'panda_joint3', 'panda_joint4', 'panda_joint5', 'panda_joint6', 'panda_joint7']",0.0,0.0,0.2674,-1.2706,0.0446,1.4615,-0.7132

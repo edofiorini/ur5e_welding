@@ -1,0 +1,8 @@
+prefix=/home/edoardo/ur5e_welding/install
+
+Name: smooth_trajectory
+Description: Description of smooth_trajectory
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

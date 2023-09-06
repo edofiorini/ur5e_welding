@@ -1,0 +1,10 @@
+Time,bools,ints,strs,doubles,groups
+1671701202.7777112,"[name: ""publish_planning_scene""
+value: True, name: ""publish_geometry_updates""
+value: True, name: ""publish_state_updates""
+value: True, name: ""publish_transforms_updates""
+value: True]",[],[],"[name: ""publish_planning_scene_hz""
+value: 4.0]","[name: ""Default""
+state: True
+id: 0
+parent: 0]"
