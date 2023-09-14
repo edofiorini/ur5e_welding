@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/edoardo/ur5e_welding/devel/lib/ur_ros/ur_ros_node"
-  "/home/edoardo/ur5e_welding/devel/lib/ur_ros/ur_ros_node.pdb"
+  "/home/saras/Workspace/ur5e_welding/devel/lib/ur_ros/ur_ros_node"
+  "/home/saras/Workspace/ur5e_welding/devel/lib/ur_ros/ur_ros_node.pdb"
   "CMakeFiles/ur_ros_node.dir/src/robot_kinematics.cpp.o"
   "CMakeFiles/ur_ros_node.dir/src/ur_ros_node.cpp.o"
 )

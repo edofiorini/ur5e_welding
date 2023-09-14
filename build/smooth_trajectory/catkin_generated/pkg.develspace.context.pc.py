@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "smooth_trajectory"
-PROJECT_SPACE_DIR = "/home/edoardo/ur5e_welding/devel"
+PROJECT_SPACE_DIR = "/home/saras/Workspace/ur5e_welding/devel"
 PROJECT_VERSION = "0.0.0"

@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/edoardo/ur5e_welding/src
+CMAKE_SOURCE_DIR = /home/saras/Workspace/ur5e_welding/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/edoardo/ur5e_welding/build
+CMAKE_BINARY_DIR = /home/saras/Workspace/ur5e_welding/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -102,28 +102,6 @@ list_install_components/fast: list_install_components
 
 .PHONY : list_install_components/fast
 
-# Special rule for the target test
-test:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	/usr/bin/ctest --force-new-ctest-process $(ARGS)
-.PHONY : test
-
-# Special rule for the target test
-test/fast: test
-
-.PHONY : test/fast
-
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -135,16 +113,38 @@ rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
 
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/usr/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
+
 # The main all target
 all: cmake_check_build_system
-	cd /home/edoardo/ur5e_welding/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/edoardo/ur5e_welding/build/CMakeFiles /home/edoardo/ur5e_welding/build/ur_ros/CMakeFiles/progress.marks
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/edoardo/ur5e_welding/build/CMakeFiles 0
+	cd /home/saras/Workspace/ur5e_welding/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/saras/Workspace/ur5e_welding/build/CMakeFiles /home/saras/Workspace/ur5e_welding/build/ur_ros/CMakeFiles/progress.marks
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/saras/Workspace/ur5e_welding/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/clean
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/clean
 .PHONY : clean
 
 # The main clean target
@@ -154,22 +154,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/preinstall
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/preinstall
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/edoardo/ur5e_welding/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/saras/Workspace/ur5e_welding/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 ur_ros/CMakeFiles/ur_ros_node.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/ur_ros_node.dir/rule
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/ur_ros_node.dir/rule
 .PHONY : ur_ros/CMakeFiles/ur_ros_node.dir/rule
 
 # Convenience name for target.
@@ -179,383 +179,8 @@ ur_ros_node: ur_ros/CMakeFiles/ur_ros_node.dir/rule
 
 # fast build rule for target.
 ur_ros_node/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/build
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/build
 .PHONY : ur_ros_node/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf_generate_messages_py.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf_generate_messages_py.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf_generate_messages_py.dir/rule
-
-# Convenience name for target.
-tf_generate_messages_py: ur_ros/CMakeFiles/tf_generate_messages_py.dir/rule
-
-.PHONY : tf_generate_messages_py
-
-# fast build rule for target.
-tf_generate_messages_py/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf_generate_messages_py.dir/build.make ur_ros/CMakeFiles/tf_generate_messages_py.dir/build
-.PHONY : tf_generate_messages_py/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf_generate_messages_cpp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf_generate_messages_cpp.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-tf_generate_messages_cpp: ur_ros/CMakeFiles/tf_generate_messages_cpp.dir/rule
-
-.PHONY : tf_generate_messages_cpp
-
-# fast build rule for target.
-tf_generate_messages_cpp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf_generate_messages_cpp.dir/build.make ur_ros/CMakeFiles/tf_generate_messages_cpp.dir/build
-.PHONY : tf_generate_messages_cpp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_generate_messages_py.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_generate_messages_py.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_generate_messages_py.dir/rule
-
-# Convenience name for target.
-actionlib_generate_messages_py: ur_ros/CMakeFiles/actionlib_generate_messages_py.dir/rule
-
-.PHONY : actionlib_generate_messages_py
-
-# fast build rule for target.
-actionlib_generate_messages_py/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_generate_messages_py.dir/build.make ur_ros/CMakeFiles/actionlib_generate_messages_py.dir/build
-.PHONY : actionlib_generate_messages_py/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-actionlib_msgs_generate_messages_nodejs: ur_ros/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : actionlib_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-actionlib_msgs_generate_messages_nodejs/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/build.make ur_ros/CMakeFiles/actionlib_msgs_generate_messages_nodejs.dir/build
-.PHONY : actionlib_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/sensor_msgs_generate_messages_py.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/sensor_msgs_generate_messages_py.dir/rule
-.PHONY : ur_ros/CMakeFiles/sensor_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-sensor_msgs_generate_messages_py: ur_ros/CMakeFiles/sensor_msgs_generate_messages_py.dir/rule
-
-.PHONY : sensor_msgs_generate_messages_py
-
-# fast build rule for target.
-sensor_msgs_generate_messages_py/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/sensor_msgs_generate_messages_py.dir/build.make ur_ros/CMakeFiles/sensor_msgs_generate_messages_py.dir/build
-.PHONY : sensor_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_msgs_generate_messages_eus.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_msgs_generate_messages_eus.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-actionlib_msgs_generate_messages_eus: ur_ros/CMakeFiles/actionlib_msgs_generate_messages_eus.dir/rule
-
-.PHONY : actionlib_msgs_generate_messages_eus
-
-# fast build rule for target.
-actionlib_msgs_generate_messages_eus/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_msgs_generate_messages_eus.dir/build.make ur_ros/CMakeFiles/actionlib_msgs_generate_messages_eus.dir/build
-.PHONY : actionlib_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-tf2_msgs_generate_messages_lisp: ur_ros/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : tf2_msgs_generate_messages_lisp
-
-# fast build rule for target.
-tf2_msgs_generate_messages_lisp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/build.make ur_ros/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/build
-.PHONY : tf2_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/sensor_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/sensor_msgs_generate_messages_nodejs.dir/rule
-.PHONY : ur_ros/CMakeFiles/sensor_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-sensor_msgs_generate_messages_nodejs: ur_ros/CMakeFiles/sensor_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : sensor_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-sensor_msgs_generate_messages_nodejs/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/sensor_msgs_generate_messages_nodejs.dir/build.make ur_ros/CMakeFiles/sensor_msgs_generate_messages_nodejs.dir/build
-.PHONY : sensor_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/rule
-.PHONY : ur_ros/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-sensor_msgs_generate_messages_lisp: ur_ros/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : sensor_msgs_generate_messages_lisp
-
-# fast build rule for target.
-sensor_msgs_generate_messages_lisp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/build.make ur_ros/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/build
-.PHONY : sensor_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/sensor_msgs_generate_messages_eus.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/sensor_msgs_generate_messages_eus.dir/rule
-.PHONY : ur_ros/CMakeFiles/sensor_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-sensor_msgs_generate_messages_eus: ur_ros/CMakeFiles/sensor_msgs_generate_messages_eus.dir/rule
-
-.PHONY : sensor_msgs_generate_messages_eus
-
-# fast build rule for target.
-sensor_msgs_generate_messages_eus/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/sensor_msgs_generate_messages_eus.dir/build.make ur_ros/CMakeFiles/sensor_msgs_generate_messages_eus.dir/build
-.PHONY : sensor_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_generate_messages_lisp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_generate_messages_lisp.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-actionlib_generate_messages_lisp: ur_ros/CMakeFiles/actionlib_generate_messages_lisp.dir/rule
-
-.PHONY : actionlib_generate_messages_lisp
-
-# fast build rule for target.
-actionlib_generate_messages_lisp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_generate_messages_lisp.dir/build.make ur_ros/CMakeFiles/actionlib_generate_messages_lisp.dir/build
-.PHONY : actionlib_generate_messages_lisp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf_generate_messages_nodejs.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf_generate_messages_nodejs.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-tf_generate_messages_nodejs: ur_ros/CMakeFiles/tf_generate_messages_nodejs.dir/rule
-
-.PHONY : tf_generate_messages_nodejs
-
-# fast build rule for target.
-tf_generate_messages_nodejs/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf_generate_messages_nodejs.dir/build.make ur_ros/CMakeFiles/tf_generate_messages_nodejs.dir/build
-.PHONY : tf_generate_messages_nodejs/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule
-.PHONY : ur_ros/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-sensor_msgs_generate_messages_cpp: ur_ros/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : sensor_msgs_generate_messages_cpp
-
-# fast build rule for target.
-sensor_msgs_generate_messages_cpp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/build.make ur_ros/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/build
-.PHONY : sensor_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_generate_messages_nodejs.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_generate_messages_nodejs.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-actionlib_generate_messages_nodejs: ur_ros/CMakeFiles/actionlib_generate_messages_nodejs.dir/rule
-
-.PHONY : actionlib_generate_messages_nodejs
-
-# fast build rule for target.
-actionlib_generate_messages_nodejs/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_generate_messages_nodejs.dir/build.make ur_ros/CMakeFiles/actionlib_generate_messages_nodejs.dir/build
-.PHONY : actionlib_generate_messages_nodejs/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_generate_messages_eus.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_generate_messages_eus.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-actionlib_generate_messages_eus: ur_ros/CMakeFiles/actionlib_generate_messages_eus.dir/rule
-
-.PHONY : actionlib_generate_messages_eus
-
-# fast build rule for target.
-actionlib_generate_messages_eus/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_generate_messages_eus.dir/build.make ur_ros/CMakeFiles/actionlib_generate_messages_eus.dir/build
-.PHONY : actionlib_generate_messages_eus/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_msgs_generate_messages_cpp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_msgs_generate_messages_cpp.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-actionlib_msgs_generate_messages_cpp: ur_ros/CMakeFiles/actionlib_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : actionlib_msgs_generate_messages_cpp
-
-# fast build rule for target.
-actionlib_msgs_generate_messages_cpp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_msgs_generate_messages_cpp.dir/build.make ur_ros/CMakeFiles/actionlib_msgs_generate_messages_cpp.dir/build
-.PHONY : actionlib_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_msgs_generate_messages_lisp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_msgs_generate_messages_lisp.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-actionlib_msgs_generate_messages_lisp: ur_ros/CMakeFiles/actionlib_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : actionlib_msgs_generate_messages_lisp
-
-# fast build rule for target.
-actionlib_msgs_generate_messages_lisp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_msgs_generate_messages_lisp.dir/build.make ur_ros/CMakeFiles/actionlib_msgs_generate_messages_lisp.dir/build
-.PHONY : actionlib_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_generate_messages_cpp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_generate_messages_cpp.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-actionlib_generate_messages_cpp: ur_ros/CMakeFiles/actionlib_generate_messages_cpp.dir/rule
-
-.PHONY : actionlib_generate_messages_cpp
-
-# fast build rule for target.
-actionlib_generate_messages_cpp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_generate_messages_cpp.dir/build.make ur_ros/CMakeFiles/actionlib_generate_messages_cpp.dir/build
-.PHONY : actionlib_generate_messages_cpp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/actionlib_msgs_generate_messages_py.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/actionlib_msgs_generate_messages_py.dir/rule
-.PHONY : ur_ros/CMakeFiles/actionlib_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-actionlib_msgs_generate_messages_py: ur_ros/CMakeFiles/actionlib_msgs_generate_messages_py.dir/rule
-
-.PHONY : actionlib_msgs_generate_messages_py
-
-# fast build rule for target.
-actionlib_msgs_generate_messages_py/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/actionlib_msgs_generate_messages_py.dir/build.make ur_ros/CMakeFiles/actionlib_msgs_generate_messages_py.dir/build
-.PHONY : actionlib_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf_generate_messages_eus.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf_generate_messages_eus.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-tf_generate_messages_eus: ur_ros/CMakeFiles/tf_generate_messages_eus.dir/rule
-
-.PHONY : tf_generate_messages_eus
-
-# fast build rule for target.
-tf_generate_messages_eus/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf_generate_messages_eus.dir/build.make ur_ros/CMakeFiles/tf_generate_messages_eus.dir/build
-.PHONY : tf_generate_messages_eus/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-tf2_msgs_generate_messages_cpp: ur_ros/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : tf2_msgs_generate_messages_cpp
-
-# fast build rule for target.
-tf2_msgs_generate_messages_cpp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/build.make ur_ros/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/build
-.PHONY : tf2_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-tf2_msgs_generate_messages_nodejs: ur_ros/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : tf2_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-tf2_msgs_generate_messages_nodejs/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/build.make ur_ros/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/build
-.PHONY : tf2_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-tf2_msgs_generate_messages_py: ur_ros/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule
-
-.PHONY : tf2_msgs_generate_messages_py
-
-# fast build rule for target.
-tf2_msgs_generate_messages_py/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf2_msgs_generate_messages_py.dir/build.make ur_ros/CMakeFiles/tf2_msgs_generate_messages_py.dir/build
-.PHONY : tf2_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf_generate_messages_lisp.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf_generate_messages_lisp.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-tf_generate_messages_lisp: ur_ros/CMakeFiles/tf_generate_messages_lisp.dir/rule
-
-.PHONY : tf_generate_messages_lisp
-
-# fast build rule for target.
-tf_generate_messages_lisp/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf_generate_messages_lisp.dir/build.make ur_ros/CMakeFiles/tf_generate_messages_lisp.dir/build
-.PHONY : tf_generate_messages_lisp/fast
-
-# Convenience name for target.
-ur_ros/CMakeFiles/tf2_msgs_generate_messages_eus.dir/rule:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f CMakeFiles/Makefile2 ur_ros/CMakeFiles/tf2_msgs_generate_messages_eus.dir/rule
-.PHONY : ur_ros/CMakeFiles/tf2_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-tf2_msgs_generate_messages_eus: ur_ros/CMakeFiles/tf2_msgs_generate_messages_eus.dir/rule
-
-.PHONY : tf2_msgs_generate_messages_eus
-
-# fast build rule for target.
-tf2_msgs_generate_messages_eus/fast:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/tf2_msgs_generate_messages_eus.dir/build.make ur_ros/CMakeFiles/tf2_msgs_generate_messages_eus.dir/build
-.PHONY : tf2_msgs_generate_messages_eus/fast
 
 src/robot_kinematics.o: src/robot_kinematics.cpp.o
 
@@ -563,7 +188,7 @@ src/robot_kinematics.o: src/robot_kinematics.cpp.o
 
 # target to build an object file
 src/robot_kinematics.cpp.o:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/robot_kinematics.cpp.o
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/robot_kinematics.cpp.o
 .PHONY : src/robot_kinematics.cpp.o
 
 src/robot_kinematics.i: src/robot_kinematics.cpp.i
@@ -572,7 +197,7 @@ src/robot_kinematics.i: src/robot_kinematics.cpp.i
 
 # target to preprocess a source file
 src/robot_kinematics.cpp.i:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/robot_kinematics.cpp.i
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/robot_kinematics.cpp.i
 .PHONY : src/robot_kinematics.cpp.i
 
 src/robot_kinematics.s: src/robot_kinematics.cpp.s
@@ -581,7 +206,7 @@ src/robot_kinematics.s: src/robot_kinematics.cpp.s
 
 # target to generate assembly for a file
 src/robot_kinematics.cpp.s:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/robot_kinematics.cpp.s
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/robot_kinematics.cpp.s
 .PHONY : src/robot_kinematics.cpp.s
 
 src/ur_ros_node.o: src/ur_ros_node.cpp.o
@@ -590,7 +215,7 @@ src/ur_ros_node.o: src/ur_ros_node.cpp.o
 
 # target to build an object file
 src/ur_ros_node.cpp.o:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/ur_ros_node.cpp.o
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/ur_ros_node.cpp.o
 .PHONY : src/ur_ros_node.cpp.o
 
 src/ur_ros_node.i: src/ur_ros_node.cpp.i
@@ -599,7 +224,7 @@ src/ur_ros_node.i: src/ur_ros_node.cpp.i
 
 # target to preprocess a source file
 src/ur_ros_node.cpp.i:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/ur_ros_node.cpp.i
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/ur_ros_node.cpp.i
 .PHONY : src/ur_ros_node.cpp.i
 
 src/ur_ros_node.s: src/ur_ros_node.cpp.s
@@ -608,7 +233,7 @@ src/ur_ros_node.s: src/ur_ros_node.cpp.s
 
 # target to generate assembly for a file
 src/ur_ros_node.cpp.s:
-	cd /home/edoardo/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/ur_ros_node.cpp.s
+	cd /home/saras/Workspace/ur5e_welding/build && $(MAKE) -f ur_ros/CMakeFiles/ur_ros_node.dir/build.make ur_ros/CMakeFiles/ur_ros_node.dir/src/ur_ros_node.cpp.s
 .PHONY : src/ur_ros_node.cpp.s
 
 # Help Target
@@ -621,35 +246,10 @@ help:
 	@echo "... install/local"
 	@echo "... install"
 	@echo "... list_install_components"
-	@echo "... ur_ros_node"
-	@echo "... tf_generate_messages_py"
-	@echo "... tf_generate_messages_cpp"
-	@echo "... actionlib_generate_messages_py"
-	@echo "... actionlib_msgs_generate_messages_nodejs"
-	@echo "... sensor_msgs_generate_messages_py"
-	@echo "... actionlib_msgs_generate_messages_eus"
-	@echo "... tf2_msgs_generate_messages_lisp"
-	@echo "... sensor_msgs_generate_messages_nodejs"
-	@echo "... sensor_msgs_generate_messages_lisp"
-	@echo "... sensor_msgs_generate_messages_eus"
-	@echo "... actionlib_generate_messages_lisp"
-	@echo "... tf_generate_messages_nodejs"
-	@echo "... sensor_msgs_generate_messages_cpp"
-	@echo "... actionlib_generate_messages_nodejs"
-	@echo "... actionlib_generate_messages_eus"
-	@echo "... actionlib_msgs_generate_messages_cpp"
-	@echo "... actionlib_msgs_generate_messages_lisp"
-	@echo "... test"
-	@echo "... actionlib_generate_messages_cpp"
-	@echo "... actionlib_msgs_generate_messages_py"
-	@echo "... tf_generate_messages_eus"
-	@echo "... tf2_msgs_generate_messages_cpp"
-	@echo "... tf2_msgs_generate_messages_nodejs"
-	@echo "... tf2_msgs_generate_messages_py"
-	@echo "... tf_generate_messages_lisp"
-	@echo "... edit_cache"
-	@echo "... tf2_msgs_generate_messages_eus"
 	@echo "... rebuild_cache"
+	@echo "... edit_cache"
+	@echo "... test"
+	@echo "... ur_ros_node"
 	@echo "... src/robot_kinematics.o"
 	@echo "... src/robot_kinematics.i"
 	@echo "... src/robot_kinematics.s"
@@ -667,6 +267,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/edoardo/ur5e_welding/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/saras/Workspace/ur5e_welding/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

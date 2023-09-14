@@ -1,8 +1,8 @@
-# Install script for directory: /home/edoardo/ur5e_welding/src/smooth_trajectory
+# Install script for directory: /home/saras/Workspace/ur5e_welding/src/smooth_trajectory
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/edoardo/ur5e_welding/install")
+  set(CMAKE_INSTALL_PREFIX "/home/saras/Workspace/ur5e_welding/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -38,17 +38,17 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/edoardo/ur5e_welding/build/smooth_trajectory/catkin_generated/installspace/smooth_trajectory.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/saras/Workspace/ur5e_welding/build/smooth_trajectory/catkin_generated/installspace/smooth_trajectory.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/smooth_trajectory/cmake" TYPE FILE FILES
-    "/home/edoardo/ur5e_welding/build/smooth_trajectory/catkin_generated/installspace/smooth_trajectoryConfig.cmake"
-    "/home/edoardo/ur5e_welding/build/smooth_trajectory/catkin_generated/installspace/smooth_trajectoryConfig-version.cmake"
+    "/home/saras/Workspace/ur5e_welding/build/smooth_trajectory/catkin_generated/installspace/smooth_trajectoryConfig.cmake"
+    "/home/saras/Workspace/ur5e_welding/build/smooth_trajectory/catkin_generated/installspace/smooth_trajectoryConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/smooth_trajectory" TYPE FILE FILES "/home/edoardo/ur5e_welding/src/smooth_trajectory/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/smooth_trajectory" TYPE FILE FILES "/home/saras/Workspace/ur5e_welding/src/smooth_trajectory/package.xml")
 endif()
 

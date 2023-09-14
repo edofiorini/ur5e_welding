@@ -1,8 +1,8 @@
-# Install script for directory: /home/edoardo/ur5e_welding/src
+# Install script for directory: /home/saras/Workspace/ur5e_welding/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/edoardo/ur5e_welding/install")
+  set(CMAKE_INSTALL_PREFIX "/home/saras/Workspace/ur5e_welding/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -49,90 +49,92 @@ endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/edoardo/ur5e_welding/install/_setup_util.py")
+   "/home/saras/Workspace/ur5e_welding/install/_setup_util.py")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/edoardo/ur5e_welding/install" TYPE PROGRAM FILES "/home/edoardo/ur5e_welding/build/catkin_generated/installspace/_setup_util.py")
+file(INSTALL DESTINATION "/home/saras/Workspace/ur5e_welding/install" TYPE PROGRAM FILES "/home/saras/Workspace/ur5e_welding/build/catkin_generated/installspace/_setup_util.py")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/edoardo/ur5e_welding/install/env.sh")
+   "/home/saras/Workspace/ur5e_welding/install/env.sh")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/edoardo/ur5e_welding/install" TYPE PROGRAM FILES "/home/edoardo/ur5e_welding/build/catkin_generated/installspace/env.sh")
+file(INSTALL DESTINATION "/home/saras/Workspace/ur5e_welding/install" TYPE PROGRAM FILES "/home/saras/Workspace/ur5e_welding/build/catkin_generated/installspace/env.sh")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/edoardo/ur5e_welding/install/setup.bash;/home/edoardo/ur5e_welding/install/local_setup.bash")
+   "/home/saras/Workspace/ur5e_welding/install/setup.bash;/home/saras/Workspace/ur5e_welding/install/local_setup.bash")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/edoardo/ur5e_welding/install" TYPE FILE FILES
-    "/home/edoardo/ur5e_welding/build/catkin_generated/installspace/setup.bash"
-    "/home/edoardo/ur5e_welding/build/catkin_generated/installspace/local_setup.bash"
+file(INSTALL DESTINATION "/home/saras/Workspace/ur5e_welding/install" TYPE FILE FILES
+    "/home/saras/Workspace/ur5e_welding/build/catkin_generated/installspace/setup.bash"
+    "/home/saras/Workspace/ur5e_welding/build/catkin_generated/installspace/local_setup.bash"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/edoardo/ur5e_welding/install/setup.sh;/home/edoardo/ur5e_welding/install/local_setup.sh")
+   "/home/saras/Workspace/ur5e_welding/install/setup.sh;/home/saras/Workspace/ur5e_welding/install/local_setup.sh")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/edoardo/ur5e_welding/install" TYPE FILE FILES
-    "/home/edoardo/ur5e_welding/build/catkin_generated/installspace/setup.sh"
-    "/home/edoardo/ur5e_welding/build/catkin_generated/installspace/local_setup.sh"
+file(INSTALL DESTINATION "/home/saras/Workspace/ur5e_welding/install" TYPE FILE FILES
+    "/home/saras/Workspace/ur5e_welding/build/catkin_generated/installspace/setup.sh"
+    "/home/saras/Workspace/ur5e_welding/build/catkin_generated/installspace/local_setup.sh"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/edoardo/ur5e_welding/install/setup.zsh;/home/edoardo/ur5e_welding/install/local_setup.zsh")
+   "/home/saras/Workspace/ur5e_welding/install/setup.zsh;/home/saras/Workspace/ur5e_welding/install/local_setup.zsh")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/edoardo/ur5e_welding/install" TYPE FILE FILES
-    "/home/edoardo/ur5e_welding/build/catkin_generated/installspace/setup.zsh"
-    "/home/edoardo/ur5e_welding/build/catkin_generated/installspace/local_setup.zsh"
+file(INSTALL DESTINATION "/home/saras/Workspace/ur5e_welding/install" TYPE FILE FILES
+    "/home/saras/Workspace/ur5e_welding/build/catkin_generated/installspace/setup.zsh"
+    "/home/saras/Workspace/ur5e_welding/build/catkin_generated/installspace/local_setup.zsh"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/edoardo/ur5e_welding/install/.rosinstall")
+   "/home/saras/Workspace/ur5e_welding/install/.rosinstall")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/home/edoardo/ur5e_welding/install" TYPE FILE FILES "/home/edoardo/ur5e_welding/build/catkin_generated/installspace/.rosinstall")
+file(INSTALL DESTINATION "/home/saras/Workspace/ur5e_welding/install" TYPE FILE FILES "/home/saras/Workspace/ur5e_welding/build/catkin_generated/installspace/.rosinstall")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/edoardo/ur5e_welding/build/gtest/cmake_install.cmake")
-  include("/home/edoardo/ur5e_welding/build/smooth_trajectory/cmake_install.cmake")
-  include("/home/edoardo/ur5e_welding/build/ur_ros/cmake_install.cmake")
+  include("/home/saras/Workspace/ur5e_welding/build/gtest/cmake_install.cmake")
+  include("/home/saras/Workspace/ur5e_welding/build/smooth_trajectory/cmake_install.cmake")
+  include("/home/saras/Workspace/ur5e_welding/build/global_frame_registration/cmake_install.cmake")
+  include("/home/saras/Workspace/ur5e_welding/build/optitrack/cmake_install.cmake")
+  include("/home/saras/Workspace/ur5e_welding/build/ur_ros/cmake_install.cmake")
 
 endif()
 
@@ -144,5 +146,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/edoardo/ur5e_welding/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/saras/Workspace/ur5e_welding/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

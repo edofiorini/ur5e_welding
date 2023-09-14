@@ -1,2 +1,2 @@
-smooth_trajectory:ur_ros
--DCATKIN_DEVEL_PREFIX=/home/edoardo/ur5e_welding/devel -DCMAKE_INSTALL_PREFIX=/home/edoardo/ur5e_welding/install -G Unix Makefiles
+global_frame_registration:optitrack:smooth_trajectory:ur_ros
+-DCATKIN_DEVEL_PREFIX=/home/saras/Workspace/ur5e_welding/devel -DCMAKE_INSTALL_PREFIX=/home/saras/Workspace/ur5e_welding/install -G Unix Makefiles

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     <node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node" output="screen">
-        <param name="server" value="192.168.137.220"/>
+        <param name="server" value="192.168.137.214"/>
         <param name="frame_id" value="optitrack_world"/>
         <param name="refresh_tracker_frequency" value="1.0"/>
         <param name="broadcast_tf" value="true"/>

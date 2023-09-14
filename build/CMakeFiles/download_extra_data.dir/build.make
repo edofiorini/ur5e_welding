@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/edoardo/ur5e_welding/src
+CMAKE_SOURCE_DIR = /home/saras/Workspace/ur5e_welding/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/edoardo/ur5e_welding/build
+CMAKE_BINARY_DIR = /home/saras/Workspace/ur5e_welding/build
 
 # Utility rule file for download_extra_data.
 
@@ -67,6 +67,6 @@ CMakeFiles/download_extra_data.dir/clean:
 .PHONY : CMakeFiles/download_extra_data.dir/clean
 
 CMakeFiles/download_extra_data.dir/depend:
-	cd /home/edoardo/ur5e_welding/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/edoardo/ur5e_welding/src /home/edoardo/ur5e_welding/src /home/edoardo/ur5e_welding/build /home/edoardo/ur5e_welding/build /home/edoardo/ur5e_welding/build/CMakeFiles/download_extra_data.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/saras/Workspace/ur5e_welding/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/saras/Workspace/ur5e_welding/src /home/saras/Workspace/ur5e_welding/src /home/saras/Workspace/ur5e_welding/build /home/saras/Workspace/ur5e_welding/build /home/saras/Workspace/ur5e_welding/build/CMakeFiles/download_extra_data.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/download_extra_data.dir/depend
 

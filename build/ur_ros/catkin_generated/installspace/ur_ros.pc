@@ -1,4 +1,4 @@
-prefix=/home/edoardo/ur5e_welding/install
+prefix=/home/saras/Workspace/ur5e_welding/install
 
 Name: ur_ros
 Description: Description of ur_ros

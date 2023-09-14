@@ -1,8 +1,8 @@
-prefix=/home/edoardo/ur5e_welding/devel
+prefix=/home/saras/Workspace/ur5e_welding/devel
 
 Name: ur_ros
 Description: Description of ur_ros
 Version: 0.0.0
-Cflags: -I/home/edoardo/ur5e_welding/src/ur_ros/include
+Cflags: -I/home/saras/Workspace/ur5e_welding/src/ur_ros/include
 Libs: -L${prefix}/lib 
 Requires: 

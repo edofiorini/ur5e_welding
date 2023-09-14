@@ -1,0 +1,8 @@
+prefix=/home/saras/Workspace/ur5e_welding/devel
+
+Name: optitrack
+Description: Description of optitrack
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

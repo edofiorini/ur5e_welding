@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="global_frame" default="/world" />
+    <arg name="tool_points" default="3" />
+    <arg name="load_reference" default="false" />
+
+    <!-- MESA_RIGHT HAND-EYE CALIB -->
+    <!-- <node pkg="tf" type="static_transform_publisher" name="welding_static_pub" output="screen" args="0 0 0 0 0 0 1 /panda_EE /panda_weldingpointer 10"/> -->
+
+    <node pkg="global_frame_registration" name="global_frame_registration" type="global_frame_registration" required="true" output="screen">
+        <rosparam>
+        tool_subscribers: [/surgeon/left/end_effector, /ee_pose]
+        camera_subscribers: []
+        rgbd_subscribers: []
+        registrations:
+        - frame_id: /ur/base
+          orientation: [0.027181095405707047,  0.00855711069136835, -0.7060111979066844, 0.7076271280409833]
+          parent_frame: /world
+          position: [0.08548244629608295, 0.4072673842781244,-0.12862767133602235]
+        - frame_id: /optitrack_world
+          orientation: [0.2964926942301582, 0.8607981083838315, 0.14158306377803412, 0.3886810195033772]
+          parent_frame: /world
+          position: [0.5000721159753532,   -0.3801561111809514, 0.16057109716172924]
+        </rosparam>
+        <param name="global_frame_name" type="string" value="$(arg global_frame)" />
+        <param name="num_points" type="int" value="$(arg tool_points)" />
+        <param name="use_existing" type="bool" value="$(arg load_reference)" />
+    </node>
+
+</launch>

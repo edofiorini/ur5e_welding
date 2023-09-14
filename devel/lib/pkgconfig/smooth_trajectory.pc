@@ -1,4 +1,4 @@
-prefix=/home/edoardo/ur5e_welding/devel
+prefix=/home/saras/Workspace/ur5e_welding/devel
 
 Name: smooth_trajectory
 Description: Description of smooth_trajectory

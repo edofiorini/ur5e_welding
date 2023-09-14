@@ -1,0 +1,8 @@
+# generated from catkin/cmake/template/pkg.context.pc.in
+CATKIN_PACKAGE_PREFIX = ""
+PROJECT_PKG_CONFIG_INCLUDE_DIRS = "/home/saras/Workspace/ur5e_welding/src/global_frame_registration/include".split(';') if "/home/saras/Workspace/ur5e_welding/src/global_frame_registration/include" != "" else []
+PROJECT_CATKIN_DEPENDS = "geometry_msgs;roscpp;std_msgs".replace(';', ' ')
+PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
+PROJECT_NAME = "global_frame_registration"
+PROJECT_SPACE_DIR = "/home/saras/Workspace/ur5e_welding/devel"
+PROJECT_VERSION = "0.0.0"

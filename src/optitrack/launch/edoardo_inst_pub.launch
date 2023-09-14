@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="rate" default="100"/>
+    <arg name="cutoff" default="100"/>
+    <arg name="use_filt" default="false"/>
+    <arg name="left_filt_frame_id" default="/surgeon/left_tool"/>
+
+    <include file="$(find optitrack)/launch/vrpn_client.launch" />
+
+    <node pkg="optitrack" type="instrument_pose_publisher" name="instrument_pose_publisher_left" output="screen">
+        <rosparam file="$(find optitrack)/config/left.yaml" command="load"/>
+        <!-- <param name="child_frame_id" value="/surgeon/left_tool/pose"/> -->
+        <param name="child_frame_id" value="/surgeon/left/end_effector"/>
+        <param name="rate" value="$(arg rate)"/>
+        <param name="use_filt" value="$(arg use_filt)"/>
+        <param name="filt_frame_id" value="$(arg left_filt_frame_id)"/>
+    </node>
+
+</launch>

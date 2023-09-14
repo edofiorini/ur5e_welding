@@ -7,9 +7,9 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/home/edoardo/ur5e_welding/devel:$CMAKE_PREFIX_PATH"
-export LD_LIBRARY_PATH="/home/edoardo/ur5e_welding/devel/lib:$LD_LIBRARY_PATH"
-export PKG_CONFIG_PATH="/home/edoardo/ur5e_welding/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
-export PWD='/home/edoardo/ur5e_welding/build'
-export ROSLISP_PACKAGE_DIRECTORIES='/home/edoardo/ur5e_welding/devel/share/common-lisp'
-export ROS_PACKAGE_PATH="/home/edoardo/ur5e_welding/src:$ROS_PACKAGE_PATH"
+export CMAKE_PREFIX_PATH="/home/saras/Workspace/ur5e_welding/devel:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/saras/Workspace/ur5e_welding/devel/lib:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="/home/saras/Workspace/ur5e_welding/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
+export PWD='/home/saras/Workspace/ur5e_welding/build'
+export ROSLISP_PACKAGE_DIRECTORIES='/home/saras/Workspace/ur5e_welding/devel/share/common-lisp'
+export ROS_PACKAGE_PATH="/home/saras/Workspace/ur5e_welding/src:$ROS_PACKAGE_PATH"

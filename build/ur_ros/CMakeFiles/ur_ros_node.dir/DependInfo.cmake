@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/edoardo/ur5e_welding/src/ur_ros/src/robot_kinematics.cpp" "/home/edoardo/ur5e_welding/build/ur_ros/CMakeFiles/ur_ros_node.dir/src/robot_kinematics.cpp.o"
-  "/home/edoardo/ur5e_welding/src/ur_ros/src/ur_ros_node.cpp" "/home/edoardo/ur5e_welding/build/ur_ros/CMakeFiles/ur_ros_node.dir/src/ur_ros_node.cpp.o"
+  "/home/saras/Workspace/ur5e_welding/src/ur_ros/src/robot_kinematics.cpp" "/home/saras/Workspace/ur5e_welding/build/ur_ros/CMakeFiles/ur_ros_node.dir/src/robot_kinematics.cpp.o"
+  "/home/saras/Workspace/ur5e_welding/src/ur_ros/src/ur_ros_node.cpp" "/home/saras/Workspace/ur5e_welding/build/ur_ros/CMakeFiles/ur_ros_node.dir/src/ur_ros_node.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -22,7 +22,7 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/home/edoardo/ur5e_welding/src/ur_ros/include"
+  "/home/saras/Workspace/ur5e_welding/src/ur_ros/include"
   "/usr/include/eigen3"
   "/opt/ros/noetic/include"
   "/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp"

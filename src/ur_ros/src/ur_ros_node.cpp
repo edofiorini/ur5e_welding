@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     ROS_INFO_STREAM("Connecting to robot " << robot_ip << " on urcap port " << urcap_port);
 
     ur_rtde::RTDEReceiveInterface rtde_receive(robot_ip);
-    ur_rtde::RTDEControlInterface rtde_control(robot_ip, freq, ur_rtde::RTDEControlInterface::FLAG_USE_EXT_UR_CAP, urcap_port);
+    ur_rtde::RTDEControlInterface rtde_control(robot_ip);//, freq, ur_rtde::RTDEControlInterface::FLAG_USE_EXT_UR_CAP, urcap_port);
 
     ROS_INFO_STREAM("Connected to robot " << robot_ip << " on urcap port " << urcap_port);
     ROS_INFO_STREAM("Tracking control mode enabled: " << tracking_ctrl_mode);
@@ -122,18 +122,18 @@ int main(int argc, char **argv)
         tpcWrenchPub.publish(tcpWrench_msg);
 
         // publishing the tcp pose as a transformation
-        tf::StampedTransform tcpTf;
-        tcpTf.stamp_ = ros::Time::now();
-        tcpTf.frame_id_ = robot_ns + "/base";
-        tcpTf.child_frame_id_ = robot_ns + "/end_effector";
+        // tf::StampedTransform tcpTf;
+        // tcpTf.stamp_ = ros::Time::now();
+        // tcpTf.frame_id_ = robot_ns + "/base";
+        // tcpTf.child_frame_id_ = robot_ns + "/end_effector";
 
-        tcpTf.setOrigin(tf::Vector3(
-            tcpPose_msg.pose.position.x,
-            tcpPose_msg.pose.position.y,
-            tcpPose_msg.pose.position.z));
-        tcpTf.setRotation(quat);
+        // tcpTf.setOrigin(tf::Vector3(
+        //     tcpPose_msg.pose.position.x,
+        //     tcpPose_msg.pose.position.y,
+        //     tcpPose_msg.pose.position.z));
+        // tcpTf.setRotation(quat);
 
-        broadcaster.sendTransform(tcpTf);
+        // broadcaster.sendTransform(tcpTf);
 
         if (new_joint_des)
         {

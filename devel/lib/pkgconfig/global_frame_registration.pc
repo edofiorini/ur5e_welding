@@ -1,0 +1,8 @@
+prefix=/home/saras/Workspace/ur5e_welding/devel
+
+Name: global_frame_registration
+Description: Description of global_frame_registration
+Version: 0.0.0
+Cflags: -I/home/saras/Workspace/ur5e_welding/src/global_frame_registration/include
+Libs: -L${prefix}/lib 
+Requires: geometry_msgs roscpp std_msgs
