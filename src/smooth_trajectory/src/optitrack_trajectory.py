@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from sympy import centroid
 import rospy
 import std_msgs.msg
 from geometry_msgs.msg import PoseStamped, Pose, PoseArray
@@ -24,7 +23,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
-from scipy.spatial.transform import Rotation as R
+from scipy.spatial.transform import Rotation as Rot
 
 plt.style.use('default')
 
@@ -101,11 +100,11 @@ def compute_orientation(starting_angle, ending_angle, path, pivoting_pos):
     #ending_Angle: next oientation incremented in euler angle
     #pivoting_pose: last position which must be keep equal
 
-    r_start = R.from_rotvec([starting_angle[3], starting_angle[4], starting_angle[5]])
-    r_end = R.from_euler('xyz', ending_angle)
+    r_start = Rot.from_rotvec([starting_angle[3], starting_angle[4], starting_angle[5]])
+    r_end = Rot.from_euler('xyz', ending_angle)
 
     times = np.arange(0, 1, 0.001)
-    key_rots = R.concatenate([r_start, r_end])
+    key_rots = Rot.concatenate([r_start, r_end])
 
     key_times = [0, 1]
     slerp = Slerp(key_times, key_rots)
@@ -129,10 +128,10 @@ def get_homogeneous_matrix(rot, trans):
         return hom_trans
 
 def apply_registration_to_vertices(CAD_vertices, R, t):
-    print(np.matmul(R,np.transpose(CAD_vertices)))
+    #print(np.matmul(R,np.transpose(CAD_vertices)))
 
     registered_CAD_vertices = np.matmul(R,(np.transpose(CAD_vertices))) + translation
-    print(registered_CAD_vertices)
+    return registered_CAD_vertices
         
 
 def apply_transformation(homogeneous_matrix, vector):
@@ -145,12 +144,39 @@ def apply_transformation(homogeneous_matrix, vector):
     new_vector = np.matmul(homogeneous_matrix, vector)
     return new_vector[0:3,:]
 
+def publish_trajectory_to_RVIZ(pub, trajectory):
+
+    
+    ps = PoseArray()
+    ps.header.frame_id = "ur/base"
+    ps.header.stamp = rospy.Time.now()
+    for i in range(0, len(trajectory), 100):
+        if (rospy.is_shutdown()):
+            break
+
+         # rpy
+        
+        pose = Pose()
+        pose.position.x = trajectory[i][0]
+        pose.position.y = trajectory[i][1]
+        pose.position.z = trajectory[i][2]
+
+        quat = Rot.from_rotvec([trajectory[i][3], trajectory[i][4], trajectory[i][5]]).as_quat()
+        pose.orientation.x = quat[0]
+        pose.orientation.y = quat[1]
+        pose.orientation.z = quat[2]
+        pose.orientation.w = quat[3]
+        
+        ps.poses.append(pose)   
+    pub.publish(ps)
+
  
 if __name__ == '__main__':	
     try:
         rospy.init_node('Trajectory', anonymous=True)
         transformer = tf.TransformListener()
         br = tf.TransformBroadcaster()
+        pub_rviz = rospy.Publisher("smooth_trajectory_RVIZ", PoseArray, queue_size=1)
         r = rospy.Rate(50)
     
         rospy.loginfo("Welcome to the node!")
@@ -163,15 +189,11 @@ if __name__ == '__main__':
 
         df = create_data_frame(DATA_BASE_PATH)
 
-        if SAVE_PLOT:
-            print("Save plot")
-            plot_optitrack_data(df, DATA_BASE_PATH, show_plot = True, save_plot = False)
-
         print("Loading optitrack data...")
         data_from_optitrack = df.loc[:,["pose.position.x", "pose.position.y", "pose.position.z"]]
-        data_from_optitrack.iloc[:,1] += 0.30
-        data_from_optitrack.iloc[:,2] += 0.15
-        data_from_optitrack.iloc[:,0] -= 0.00
+        data_from_optitrack.iloc[:,1] += 0.20
+        #data_from_optitrack.iloc[:,2] += 0.20
+        # data_from_optitrack.iloc[:,0] -= 0.00
         estimated_vertices = check_optitrack_data(data_from_optitrack)
         
         CAD_data, CAD_vertices = create_CAD_trajectory(data_from_optitrack.to_numpy()[1,:], data_from_optitrack)
@@ -179,7 +201,6 @@ if __name__ == '__main__':
         data_from_optitrack_flatten = data_from_optitrack.to_numpy()
         data_from_optitrack_flatten[:,1] = data_from_optitrack.to_numpy()[1,1]
         
-
         fig	 = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         #ax.scatter(CAD_data[:, 2],  CAD_data[:, 0], CAD_data[:, 1], c='green', marker='o', label='CAD-based desired trajectory')	
@@ -189,8 +210,7 @@ if __name__ == '__main__':
         ax.scatter(CAD_data[50, 2],  CAD_data[50, 0], CAD_data[50, 1], c='purple', marker='o', label='CAD data direction', s=100)
         #plt.title("Acquired data from optitrack and CAD")
         plt.legend()
-        
-        
+         
         #ax.xaxis.set_minor_locator(AutoMinorLocator())
         #ax.yaxis.set_minor_locator(AutoMinorLocator())
         #ax.zaxis.set_minor_locator(AutoMinorLocator())
@@ -203,19 +223,43 @@ if __name__ == '__main__':
         print("Applying point cloud registration...")
         CAD_data_registered, R, t, H = point_cloud_registration_ICP(np.transpose(CAD_data), np.transpose(data_from_optitrack_flatten)) 
         translation = np.array([[t[0]], [t[1]], [t[2]]])
+
+        fig	 = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter(data_from_optitrack_flatten[:, 2], data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 1], c='r', marker='o', label='Acquired optitrack trajectory')
+        #ax.scatter(data_from_optitrack_flatten[200, 2], data_from_optitrack_flatten[200, 0], data_from_optitrack_flatten[200, 1], c='black', marker='o', s= 100, label='Acquired optitrack trajectory')
+        #ax.scatter(data_from_optitrack_flatten[0, 2], data_from_optitrack_flatten[0, 0], data_from_optitrack_flatten[0, 1], c='black', marker='o', s= 100, label='Acquired optitrack trajectory')
+
+        ax.scatter(CAD_data_registered[:, 2], CAD_data_registered[:, 0], CAD_data_registered[:, 1], c='b', marker='o', label='Acquired optitrack trajectory')
+        #ax.scatter(CAD_data_registered[200, 2], CAD_data_registered[200, 0], CAD_data_registered[200, 1], c='green', marker='o', s= 100, label='Acquired optitrack trajectory')
+        #ax.scatter(CAD_data_registered[0, 2], CAD_data_registered[0, 0], CAD_data_registered[0, 1], c='green', marker='o', s= 100, label='Acquired optitrack trajectory')
+        
+        plt.legend()   
+        #ax.xaxis.set_minor_locator(AutoMinorLocator())
+        #ax.yaxis.set_minor_locator(AutoMinorLocator())
+        #ax.zaxis.set_minor_locator(AutoMinorLocator())
+        ax.zaxis.set_rotate_label(False)  # disable automatic rotation
+        ax.set_xlabel('\n' + r"$Z$  [m]", fontsize=15, linespacing=3)
+        ax.set_ylabel('\n' + r"$X$  [m]", fontsize=15, linespacing=3)
+        ax.set_zlabel('\n' + r"$Y$  [m]", fontsize=15, linespacing=3, rotation=90)
+        plt.show()
+        
         
         # Apply transformation in optitrack world frame for overlapping the vertices of the cad with the one acquired 
         vertices_registered = apply_registration_to_vertices(CAD_vertices, R, t)
         
         # Transforming the trajectory for welding the object in frame ur_base
-        (trans, rot) = transformer.lookupTransform("/ur_base", "/optitrack_world", rospy.Time(0))
+        (trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
         optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
         vertices_ur_base = apply_transformation(optitrack_to_link0_hom_trans, vertices_registered)
 
+        print("vertices", vertices_ur_base)
+
+        
         Ts = 0.001
         rtde_frequency = 500.0
-        rtde_c = RTDEControl("127.0.0.1")#, rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)
-        rtde_r = rtde_receive.RTDEReceiveInterface("127.0.0.1")
+        rtde_c = RTDEControl("192.168.137.130")#, rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)
+        rtde_r = rtde_receive.RTDEReceiveInterface("192.168.137.130")
 
         velocity = 0.5
         acceleration = 0.5
@@ -224,15 +268,15 @@ if __name__ == '__main__':
         # Go to "home demo" pose
         waypoint_j = [el*np.pi/180 for el in [-91.71, -98.96, -126.22, -46.29, 91.39, -1.78]]
         waypoint_j.extend([0.5, 0.5, 0.0])
-        rtde_c.moveJ([waypoint_j])
+        #rtde_c.moveJ([waypoint_j])
 
         #get current robot status
         curr_pose = rtde_r.getActualTCPPose()
 
         #Define first orientation
-        curr_angles = R.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
+        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
         curr_angles[1] += np.pi/6
-        next_angles_rotvec = R.from_euler('xyz', curr_angles).as_rotvec()
+        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
 
         path_c = []
 
@@ -243,41 +287,58 @@ if __name__ == '__main__':
         compute_trajectory(pi, pf, path_c, Ts)
 
         # 2
-        curr_angles = R.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
+        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
         curr_angles[0] -= np.pi/6
-        next_angles_rotvec = R.from_euler('xyz', curr_angles).as_rotvec()
+        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
         compute_orientation(path_c[-1], curr_angles, path_c, path_c[-1])
         pi = np.array([[vertices_ur_base[0,1]], [vertices_ur_base[1,1]], [vertices_ur_base[2,1]]])
         pf = np.array([[vertices_ur_base[0,2]], [vertices_ur_base[1,2]], [vertices_ur_base[2,2]]])
         compute_trajectory(pi, pf, path_c, Ts)
 
         # 3
-        curr_angles = R.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
+        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
         curr_angles[1] -= np.pi/6
-        next_angles_rotvec = R.from_euler('xyz', curr_angles).as_rotvec()
+        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
         compute_orientation(path_c[-1], curr_angles, path_c, path_c[-1])
         pi = np.array([[vertices_ur_base[0,2]], [vertices_ur_base[1,2]], [vertices_ur_base[2,2]]])
         pf = np.array([[vertices_ur_base[0,3]], [vertices_ur_base[1,3]], [vertices_ur_base[2,3]]])
         compute_trajectory(pi, pf, path_c, Ts)
 
         # 4
-        curr_angles = R.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
+        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
         curr_angles[0] += np.pi/6
-        next_angles_rotvec = R.from_euler('xyz', curr_angles).as_rotvec()
+        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
         compute_orientation(path_c[-1], curr_angles, path_c, path_c[-1])
         pi = np.array([[vertices_ur_base[0,3]], [vertices_ur_base[1,3]], [vertices_ur_base[2,3]]])
         pf = np.array([[vertices_ur_base[0,4]], [vertices_ur_base[1,4]], [vertices_ur_base[2,4]]])
         compute_trajectory(pi, pf, path_c, Ts)
 
         # back to the starting orientation
-        curr_angles = R.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
+        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
         compute_orientation(path_c[-1], curr_angles, path_c, path_c[-1])
 
+        print(len(path_c))
+        publish_trajectory_to_RVIZ(pub_rviz, path_c)
+
+        fig	 = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        #ax.scatter(vertices_ur_base[0, :], vertices_ur_base[1, :], vertices_ur_base[2, :], c='r', marker='o', label='Acquired optitrack trajectory')
+        ax.scatter(path_c[:][0], path_c[:][1], path_c[:][2], c='b', marker='o', label='Acquired optitrack trajectory')
+        plt.legend()   
+        #ax.xaxis.set_minor_locator(AutoMinorLocator())
+        #ax.yaxis.set_minor_locator(AutoMinorLocator())
+        #ax.zaxis.set_minor_locator(AutoMinorLocator())
+        ax.zaxis.set_rotate_label(False)  # disable automatic rotation
+        ax.set_xlabel('\n' + r"$Z$  [m]", fontsize=15, linespacing=3)
+        ax.set_ylabel('\n' + r"$X$  [m]", fontsize=15, linespacing=3)
+        ax.set_zlabel('\n' + r"$Y$  [m]", fontsize=15, linespacing=3, rotation=90)
+        plt.show()
+    
         #rtde_r.startFileRecording("data.csv")
-        rtde_c.moveL(path_c)
-        rtde_c.moveL(path_c)
-        rtde_c.moveL(path_c)
-        rtde_c.stopScript()
+        #rtde_c.moveL(path_c)
+        #rtde_c.moveL(path_c)
+        #rtde_c.moveL(path_c)
+        #rtde_c.stopScript()
 
     except rospy.ROSInterruptException:
         pass

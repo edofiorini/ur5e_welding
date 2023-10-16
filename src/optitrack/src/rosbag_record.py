@@ -27,6 +27,7 @@ if __name__ == '__main__':
         # Wait for shutdown signal to close rosbag record
         rospy.spin()
         
+        exit()
         print("/n")
        
         start_trajectory_script = os.path.join(dirname, 'optitrack_trajectory.sh')

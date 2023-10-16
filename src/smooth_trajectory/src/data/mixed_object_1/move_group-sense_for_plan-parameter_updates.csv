@@ -1,9 +1,0 @@
-Time,bools,ints,strs,doubles,groups
-1671120606.8839116,[],"[name: ""max_look_attempts""
-value: 3, name: ""max_cost_sources""
-value: 100]",[],"[name: ""max_safe_path_cost""
-value: 1.0, name: ""discard_overlapping_cost_sources""
-value: 0.8]","[name: ""Default""
-state: True
-id: 0
-parent: 0]"
