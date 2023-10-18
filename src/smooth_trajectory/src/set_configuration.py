@@ -5,16 +5,16 @@ SIMULATION = False
 CAD_OBJECT_SIZE = 'rectangle' # rectangle | rectangle_doublecircle | rectangle_circle | circle | B3 | deep_rectangle_doublecircle
 CAD_OBJECT_START = 'z+'
 CAD_ORIENTATION = 'right' # left or right side
-ICP_THRESHOLD = 50
+ICP_THRESHOLD = 500
 # 50 for double circle from 3 to 6
-TRAJECTORY = 'prova_ur' # which trajectory you want to work with
+TRAJECTORY = 'prova_ur_prova' # which trajectory you want to work with
 # new_doublecircle, new_rectangle, test_circle
-SAVE_CSV = False
+SAVE_CSV = True
 SAVE_PLOT = False
 plot_timing_law = False
 
 DATA_BASE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data')
-FOLDER = 'prova_ur.bag' #which data you want to unzip from bag
+FOLDER = 'prova_ur_prova.bag' #which data you want to unzip from bag
 
 
 #####               RECTANGLE CONFIGURATION                #####

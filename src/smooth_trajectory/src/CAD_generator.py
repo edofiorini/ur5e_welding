@@ -33,7 +33,7 @@ def compute_CAD_rectangle_trajectory(first_point, l_1, l_2, data, start_sign):
 		direction = 'right'
 		i = 0
   
-	first_parallel = line1.parallel_offset(l_2, direction)
+	first_parallel = line1.parallel_offset(l_2 - 0.00, direction)
 	point_C = first_parallel.coords[i]
 	line2 = LineString([point_B, point_C])
 	
@@ -369,7 +369,7 @@ def create_CAD_trajectory(first_point, data):
 	print("Creating CAD trajectory...")
 	if CAD_OBJECT_SIZE == "rectangle":
 		if CAD_OBJECT_START in ["z+", "z-"]:
-			l_1, l_2 = 0.206, 0.206 #0.205
+			l_1, l_2 = 0.20, 0.20 #0.205
 			CAD_trajectory, vertices = compute_CAD_rectangle_trajectory(first_point, l_1, l_2, data, CAD_OBJECT_START)
 		else:
 			l_1, l_2 = 0.29, 0.21

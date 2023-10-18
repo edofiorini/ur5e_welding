@@ -1,1 +1,1 @@
-rosbag record /surgeon/left/end_effector -O NAME, --output-name=prova_ur
+rosbag record /surgeon/left/end_effector -O NAME, --output-name=prova_ur_prova
