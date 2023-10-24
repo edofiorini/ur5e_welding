@@ -10,20 +10,20 @@ import pandas as pd
 import seaborn as sns
 from sklearn.linear_model import LinearRegression
 import set_configuration
-from set_configuration import*
+#from set_configuration import*
 from config import*
 
 plt.style.use('seaborn')
 
 
-def rosbag_to_csv(data_base_path = None):
+def rosbag_to_csv(data_base_path = None, FOLDER = None):
 	BAG_PATH = os.path.join(data_base_path, FOLDER)
 	if (os.path.isfile(BAG_PATH)):
 		trajectory_bag = bagreader(BAG_PATH)
 		for topic in trajectory_bag.topic_table['Topics']:
 			print(trajectory_bag.message_by_topic(topic)) # save to csv by topic
 				
-def create_data_frame(data_base_path = None):
+def create_data_frame(data_base_path = None, TRAJECTORY=None):
 	if not os.path.isdir(data_base_path):
 		os.mkdir(data_base_path)
 
@@ -43,7 +43,7 @@ def create_data_frame(data_base_path = None):
 
 def plot_optitrack_data(csv_bag_df = None, data_base_path = None, show_plot = False, save_plot = False):
 	
-	for trajectory in os.scandir(data_base_path):
+	for trajectory in os.scandir(data_base_path, TRAJECTORY):
 		if trajectory.name not in TRAJECTORY:
 			continue
 
