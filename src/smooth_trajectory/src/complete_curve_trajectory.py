@@ -291,6 +291,10 @@ if __name__ == '__main__':
             data_from_optitrack_flatten = data_from_optitrack.to_numpy()
             data_from_optitrack_flatten[:,1] = data_from_optitrack.to_numpy()[1,1]
 
+            data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
+            data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
+            data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
+
 
             X = data_from_optitrack_flatten[:, 0]
             X = X.reshape(-1,1)
