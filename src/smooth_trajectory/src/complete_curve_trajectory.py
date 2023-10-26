@@ -175,6 +175,7 @@ def apply_transformation(homogeneous_matrix, vector):
 def only_vertices(all_waypoints, path):
     curr_pose = rtde_r.getActualTCPPose()
 
+    count = 0
     for i in range(0, len(np.transpose(all_waypoints))):
         curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
 
@@ -182,15 +183,16 @@ def only_vertices(all_waypoints, path):
             axis = [1,0, 0,1,0, 1]
             angles = [+np.pi/6,0, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
 
-            curr_angles[axis[i]] += angles[i]
+            #curr_angles[axis[count]] += angles[count]
             next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+            count += 1
              
         if i < 10:
                 print("Generating trajectory for vertex number ", i)
                 waypoint = [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
         else:
                 print("Pivoting orientation for vertex number ", i)
-                compute_orientation(path[-1], curr_angles, path, [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i]])
+                #compute_orientation(path[-1], curr_angles, path, [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i]])
                 print("Generating trajectory for vertex number ", i)
                 waypoint = [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
                 
@@ -272,15 +274,15 @@ if __name__ == '__main__':
 
 
         # creating vertices container
-        
+        overall_data = np.array([])
         all_waypoints = np.empty([3, VERTICES_NUM*10])
         for i in range(0,VERTICES_NUM):
             print("Generating vertex number ", i)
             
             #Getting data from bag
-            FOLDER = "vertex_" + str(i) + ".bag"
-            TRAJECTORY = "vertex_" + str(i)
-            #rosbag_to_csv(DATA_BASE_PATH, FOLDER)
+            FOLDER = "vline_" + str(i) + ".bag"
+            TRAJECTORY = "vline_" + str(i)
+            rosbag_to_csv(DATA_BASE_PATH, FOLDER)
 
 
             df = create_data_frame(DATA_BASE_PATH, TRAJECTORY)
@@ -291,9 +293,11 @@ if __name__ == '__main__':
             data_from_optitrack_flatten = data_from_optitrack.to_numpy()
             data_from_optitrack_flatten[:,1] = data_from_optitrack.to_numpy()[1,1]
 
-            data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
-            data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
-            data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
+            overall_data = np.append(overall_data, data_from_optitrack_flatten)
+
+            # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
+            # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
+            # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
 
             X = data_from_optitrack_flatten[:, 0]
@@ -326,13 +330,15 @@ if __name__ == '__main__':
             plt.ylabel("Response")
             plt.show()
 
+        
+        overall_data = np.reshape(overall_data,(int(len(overall_data)/3),3))
 
         # uniform y-axes for each vertex
         y_mean = np.mean(all_waypoints[1,:], axis=0)
         all_waypoints[1,:] = y_mean
 
         # offset in y for safety reasons
-        all_waypoints[1,:] += 0.0
+        all_waypoints[1,:] += 0.02
         
         fig	 = plt.figure()
         ax = fig.add_subplot(111, projection="3d")
@@ -341,11 +347,15 @@ if __name__ == '__main__':
 
         print("Generated vertices w.r.t. optitrack frame:\n", all_waypoints)
         
-        exit()
+        
         # Transforming the trajectory for welding the object in frame ur_base
         (trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
         optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
         all_waypoints_ur_base = apply_transformation(optitrack_to_link0_hom_trans, all_waypoints)
+
+        (trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
+        optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
+        overall_data_ur_base = apply_transformation(optitrack_to_link0_hom_trans, np.transpose(overall_data))
 
         print("ur_vertices", all_waypoints_ur_base)
         
@@ -415,13 +425,25 @@ if __name__ == '__main__':
 
         
         publish_trajectory_to_RVIZ(pub_rviz, path_only_vertex)
+        FOLDER = "robot_pose.bag"
+        TRAJECTORY = "robot_pose"
+        rosbag_to_csv(DATA_BASE_PATH, FOLDER)
+        df = create_data_frame(DATA_BASE_PATH, TRAJECTORY)
         
+
+        data_from_robot = df.loc[:,["pose.position.x", "pose.position.y", "pose.position.z"]]
+        data_from_robot = data_from_robot.to_numpy()
+        print(data_from_robot)
         
         plot_traj = np.asarray(path_only_vertex)
         
         fig	 = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(all_waypoints_ur_base[0, :], all_waypoints_ur_base[1, :], all_waypoints_ur_base[2, :], c='r', marker='o', label='Acquired optitrack trajectory', s=100)
+        ax = fig.add_subplot(111)
+        ax.scatter(all_waypoints_ur_base[0, :]*1000, all_waypoints_ur_base[1, :]*1000, c='green', marker='o', label='Detected waypoints', s=5)
+        ax.scatter(overall_data_ur_base[0, :]*1000, overall_data_ur_base[1, :]*1000, c='red', marker='o', label='Acquired waypoints', s=0.2)
+        ax.scatter(data_from_robot[:, 0]*1000, data_from_robot[:, 1]*1000, c='blue', marker='o', label='Robot pose', s=1)
+
+
         #ax.scatter(plot_traj[:, 0], plot_traj[:,1], plot_traj[:, 2], c='b', marker='o', label='Acquired optitrack trajectory')
         plt.legend()   
         #ax.xaxis.set_minor_locator(AutoMinorLocator())
@@ -433,6 +455,7 @@ if __name__ == '__main__':
         #ax.set_zlabel('\n' + r"$Y$  [m]", fontsize=15, linespacing=3, rotation=90)
         plt.show()
 
+        exit()
         
         #rtde_r.startFileRecording("data.csv")
         rospy.Timer(rospy.Duration(0.002), logCallback)

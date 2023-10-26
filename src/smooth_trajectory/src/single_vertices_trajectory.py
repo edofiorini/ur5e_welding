@@ -103,7 +103,7 @@ def compute_orientation(starting_angle, ending_angle, path, pivoting_pos):
     r_start = Rot.from_rotvec([starting_angle[3], starting_angle[4], starting_angle[5]])
     r_end = Rot.from_euler('xyz', ending_angle)
 
-    times = np.arange(0, 1, 0.002)
+    times = np.arange(0, 1, 0.8)
     key_rots = Rot.concatenate([r_start, r_end])
 
     key_times = [0, 1]
@@ -116,7 +116,7 @@ def compute_orientation(starting_angle, ending_angle, path, pivoting_pos):
         if i == 0:
                 waypoint = [pivoting_pos[0], pivoting_pos[1], pivoting_pos[2], o[i, 0], o[i, 1], o[i, 2], velocity, acceleration, 0.0]
         else:
-                waypoint = [pivoting_pos[0], pivoting_pos[1], pivoting_pos[2], o[i, 0], o[i, 1], o[i, 2], velocity, acceleration, blend]
+                waypoint = [pivoting_pos[0], pivoting_pos[1], pivoting_pos[2], o[i, 0], o[i, 1], o[i, 2], velocity, acceleration, 0.0]
         path.append(waypoint)
 
 def go_to_first_vertex(starting_angle, ending_angle, path, pf, Ts):
@@ -177,8 +177,8 @@ def only_vertices(vertices, path):
     for i in range(0, len(np.transpose(vertices))):
         curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
 
-        axis = [1,0, 0,1,0, 1]
-        angles = [+np.pi/6,0, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
+        axis = [1, 0,1,0, 1]
+        angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
         
         curr_angles[axis[i]] += angles[i]
         next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
@@ -191,7 +191,7 @@ def only_vertices(vertices, path):
                 compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
                 print("Generating trajectory for vertex number ", i)
                 waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
-                
+        
         path.append(waypoint)
 
 def publish_trajectory_to_RVIZ(pub, trajectory):
@@ -233,24 +233,24 @@ def logCallback(event):
     tcpPose_msg.pose.orientation.w = quat[3]
     pub_current_robot_pose.publish(tcpPose_msg)
 
-    if log_index < (len(path_all_points) - 1):
-        if log_index == 0:
-            #print("sleep")
-            rospy.sleep(2)
-        #print("in")
+    # if log_index < (len(path_all_points) - 1):
+    #     if log_index == 0:
+    #         #print("sleep")
+    #         rospy.sleep(2)
+    #     #print("in")
         
-        quat = Rot.from_rotvec([path_all_points[log_index][3], path_all_points[log_index][4], path_all_points[log_index][5]]).as_quat()
-        trajPose_msg.header.stamp = rospy.Time.now()
-        trajPose_msg.header.frame_id = "ur/base"
-        trajPose_msg.pose.position.x = path_all_points[log_index][0]
-        trajPose_msg.pose.position.y = path_all_points[log_index][1]
-        trajPose_msg.pose.position.z = path_all_points[log_index][2]
-        trajPose_msg.pose.orientation.x = quat[0]
-        trajPose_msg.pose.orientation.y = quat[1]
-        trajPose_msg.pose.orientation.z = quat[2]
-        trajPose_msg.pose.orientation.w = quat[3]
-        pub_reference_traj.publish(trajPose_msg)
-        log_index += 1
+    #     quat = Rot.from_rotvec([path_all_points[log_index][3], path_all_points[log_index][4], path_all_points[log_index][5]]).as_quat()
+    #     trajPose_msg.header.stamp = rospy.Time.now()
+    #     trajPose_msg.header.frame_id = "ur/base"
+    #     trajPose_msg.pose.position.x = path_all_points[log_index][0]
+    #     trajPose_msg.pose.position.y = path_all_points[log_index][1]
+    #     trajPose_msg.pose.position.z = path_all_points[log_index][2]
+    #     trajPose_msg.pose.orientation.x = quat[0]
+    #     trajPose_msg.pose.orientation.y = quat[1]
+    #     trajPose_msg.pose.orientation.z = quat[2]
+    #     trajPose_msg.pose.orientation.w = quat[3]
+    #     pub_reference_traj.publish(trajPose_msg)
+    #     log_index += 1
     
 
 if __name__ == '__main__':	
@@ -267,12 +267,15 @@ if __name__ == '__main__':
     
         rospy.loginfo("Welcome to the node!")
 
-        fig	 = plt.figure()
-        ax = fig.add_subplot(111, projection="3d")
+
 
         # creating vertices container
         vertices = np.empty([3, VERTICES_NUM + 1])
+        overall_data = np.array([])
         for i in range(0,VERTICES_NUM):
+
+            fig	 = plt.figure()
+            ax = fig.add_subplot(111, projection="3d")
             print("Generating vertex number ", i)
             
             #Getting data from bag
@@ -289,17 +292,27 @@ if __name__ == '__main__':
             data_from_optitrack_flatten = data_from_optitrack.to_numpy()
             data_from_optitrack_flatten[:,1] = data_from_optitrack.to_numpy()[1,1]
 
-            data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
-            data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
-            data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
+            overall_data = np.append(overall_data, data_from_optitrack_flatten)
+
+            # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
+            # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
+            # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
             ax.scatter(data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 1], data_from_optitrack_flatten[:, 2], c='r', marker='o', label=TRAJECTORY)
-
+            
             vertex_median = np.median(data_from_optitrack_flatten, axis=0)
+            vertex_mean = np.mean(data_from_optitrack_flatten, axis=0)
+
             vertices[0, i] = vertex_median[0]
             vertices[1, i] = vertex_median[1]
             vertices[2, i] = vertex_median[2]
 
+            ax.scatter(vertex_median[0], vertex_median[1], vertex_median[2], c='b', marker='o', label="median")
+            ax.scatter(vertex_mean[0], vertex_mean[1], vertex_mean[2], c='g', marker='o', label="mean")
+            ax.legend()
+            plt.show()
+        
+        overall_data = np.reshape(overall_data,(int(len(overall_data)/3),3))
         # adding first vertex in the end
         vertices[0,-1] = vertices[0,0]
         vertices[1,-1] = vertices[1,0]
@@ -310,8 +323,11 @@ if __name__ == '__main__':
         vertices[1,:] = y_mean
 
         # offset in y for safety reasons
-        vertices[1,:] += 0.0
+        vertices[1,:] += 0.02
         
+
+        fig	 = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
 
         ax.scatter(vertices[0, :], vertices[1, :], vertices[2, :], c='b', marker='o', label='Generated vertices')
         plt.show()
@@ -319,12 +335,24 @@ if __name__ == '__main__':
         print("Generated vertices w.r.t. optitrack frame:\n", vertices)
         
 
+        
+        merge = sum(overall_data, [0,0,0])
+        #overall_data = np.hstack(overall_data)
+        
+        
+
         # Transforming the trajectory for welding the object in frame ur_base
         (trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
         optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
         vertices_ur_base = apply_transformation(optitrack_to_link0_hom_trans, vertices)
 
-        print("ur_vertices", vertices_ur_base)
+        (trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
+        optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
+        overall_data_ur_base = apply_transformation(optitrack_to_link0_hom_trans, np.transpose(overall_data))
+
+        print("Ur_vertices:\n", vertices_ur_base)
+        
+
         
         
         Ts = 0.002
@@ -334,7 +362,7 @@ if __name__ == '__main__':
 
         velocity = 0.5
         acceleration = 0.5
-        blend = 0.007
+        blend = 0.0067
 
         # Go to "home demo" pose
         waypoint_j = [el*np.pi/180 for el in [-1.20, -87.64, -86.19, -96.23, 91.22, -0.81]]
@@ -393,12 +421,25 @@ if __name__ == '__main__':
         
         publish_trajectory_to_RVIZ(pub_rviz, path_only_vertex)
         
+        FOLDER = "robot_pose.bag"
+        TRAJECTORY = "robot_pose"
+        #rosbag_to_csv(DATA_BASE_PATH, FOLDER)
+        df = create_data_frame(DATA_BASE_PATH, TRAJECTORY)
+        
+
+        data_from_robot = df.loc[:,["pose.position.x", "pose.position.y", "pose.position.z"]]
+        data_from_robot = data_from_robot.to_numpy()
+        print(data_from_robot)
         
         plot_traj = np.asarray(path_only_vertex)
         
         fig	 = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(vertices_ur_base[0, :], vertices_ur_base[1, :], vertices_ur_base[2, :], c='r', marker='o', label='Acquired optitrack trajectory', s=100)
+        ax = fig.add_subplot(111)
+        ax.scatter(vertices_ur_base[0, :]*1000, vertices_ur_base[1, :]*1000, c='green', marker='o', label='Detected_vertices', s=5)
+        ax.scatter(overall_data_ur_base[0, :]*1000, overall_data_ur_base[1, :]*1000, c='red', marker='o', label='Acquired vertices', s=0.3)
+        ax.scatter(data_from_robot[:, 0]*1000, data_from_robot[:, 1]*1000, c='blue', marker='o', label='Robot pose', s=1)
+
+
         #ax.scatter(plot_traj[:, 0], plot_traj[:,1], plot_traj[:, 2], c='b', marker='o', label='Acquired optitrack trajectory')
         plt.legend()   
         #ax.xaxis.set_minor_locator(AutoMinorLocator())
@@ -410,8 +451,9 @@ if __name__ == '__main__':
         #ax.set_zlabel('\n' + r"$Y$  [m]", fontsize=15, linespacing=3, rotation=90)
         plt.show()
 
+        exit()
         
-        rtde_r.startFileRecording("data.csv")
+        #rtde_r.startFileRecording("data.csv")
         rospy.Timer(rospy.Duration(0.002), logCallback)
         rtde_c.moveL(path_only_vertex)
         rtde_c.stopScript()
