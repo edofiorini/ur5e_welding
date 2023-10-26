@@ -425,15 +425,15 @@ if __name__ == '__main__':
 
         
         publish_trajectory_to_RVIZ(pub_rviz, path_only_vertex)
-        FOLDER = "robot_pose.bag"
-        TRAJECTORY = "robot_pose"
-        rosbag_to_csv(DATA_BASE_PATH, FOLDER)
-        df = create_data_frame(DATA_BASE_PATH, TRAJECTORY)
+        # FOLDER = "robot_pose.bag"
+        # TRAJECTORY = "robot_pose"
+        # rosbag_to_csv(DATA_BASE_PATH, FOLDER)
+        # df = create_data_frame(DATA_BASE_PATH, TRAJECTORY)
         
 
-        data_from_robot = df.loc[:,["pose.position.x", "pose.position.y", "pose.position.z"]]
-        data_from_robot = data_from_robot.to_numpy()
-        print(data_from_robot)
+        # data_from_robot = df.loc[:,["pose.position.x", "pose.position.y", "pose.position.z"]]
+        # data_from_robot = data_from_robot.to_numpy()
+        # print(data_from_robot)
         
         plot_traj = np.asarray(path_only_vertex)
         
@@ -441,7 +441,7 @@ if __name__ == '__main__':
         ax = fig.add_subplot(111)
         ax.scatter(all_waypoints_ur_base[0, :]*1000, all_waypoints_ur_base[1, :]*1000, c='green', marker='o', label='Detected waypoints', s=5)
         ax.scatter(overall_data_ur_base[0, :]*1000, overall_data_ur_base[1, :]*1000, c='red', marker='o', label='Acquired waypoints', s=0.2)
-        ax.scatter(data_from_robot[:, 0]*1000, data_from_robot[:, 1]*1000, c='blue', marker='o', label='Robot pose', s=1)
+        #ax.scatter(data_from_robot[:, 0]*1000, data_from_robot[:, 1]*1000, c='blue', marker='o', label='Robot pose', s=1)
 
 
         #ax.scatter(plot_traj[:, 0], plot_traj[:,1], plot_traj[:, 2], c='b', marker='o', label='Acquired optitrack trajectory')
@@ -455,7 +455,7 @@ if __name__ == '__main__':
         #ax.set_zlabel('\n' + r"$Y$  [m]", fontsize=15, linespacing=3, rotation=90)
         plt.show()
 
-        exit()
+        
         
         #rtde_r.startFileRecording("data.csv")
         rospy.Timer(rospy.Duration(0.002), logCallback)
