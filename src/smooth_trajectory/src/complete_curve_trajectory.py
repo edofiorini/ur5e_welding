@@ -280,8 +280,8 @@ if __name__ == '__main__':
             print("Generating vertex number ", i)
             
             #Getting data from bag
-            FOLDER = "vline_" + str(i) + ".bag"
-            TRAJECTORY = "vline_" + str(i)
+            FOLDER = "line_" + str(i) + ".bag"
+            TRAJECTORY = "line_" + str(i)
             rosbag_to_csv(DATA_BASE_PATH, FOLDER)
 
 
@@ -295,9 +295,9 @@ if __name__ == '__main__':
 
             overall_data = np.append(overall_data, data_from_optitrack_flatten)
 
-            # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
-            # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
-            # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
+            data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
+            data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
+            data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
 
             X = data_from_optitrack_flatten[:, 0]
@@ -359,7 +359,7 @@ if __name__ == '__main__':
 
         print("ur_vertices", all_waypoints_ur_base)
         
-        
+        exit()
         Ts = 0.002
         rtde_frequency = 500.0
         rtde_c = RTDEControl("192.168.137.130")# rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)

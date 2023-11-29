@@ -290,13 +290,13 @@ if __name__ == '__main__':
             
             # y-axis in optitrack is pointing up
             data_from_optitrack_flatten = data_from_optitrack.to_numpy()
-            data_from_optitrack_flatten[:,1] = data_from_optitrack.to_numpy()[1,1]
+            #data_from_optitrack_flatten[:,1] = data_from_optitrack.to_numpy()[1,1]
 
             overall_data = np.append(overall_data, data_from_optitrack_flatten)
 
-            # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
-            # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
-            # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
+            data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
+            data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
+            data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
             ax.scatter(data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 1], data_from_optitrack_flatten[:, 2], c='r', marker='o', label=TRAJECTORY)
             
@@ -353,7 +353,7 @@ if __name__ == '__main__':
         print("Ur_vertices:\n", vertices_ur_base)
         
 
-        
+        exit()
         
         Ts = 0.002
         rtde_frequency = 500.0
