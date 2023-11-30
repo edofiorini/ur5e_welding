@@ -43,36 +43,6 @@ def vecangle(v1, v2, normal):
     return angle
 
 
-def circular_path(pi, pf, c,  Ts):#, c, P, DP, DDP,DDDP, T, flag):
-
-    rho = np.linalg.norm(pi-c)
-    r = np.cross(c - pf, c -pi, axis=0)#c-pf, c-pi)
-    
-    arc_angle = vecangle(c-pf, c-pi, r)
-    plength = rho*arc_angle
-        
-    s = np.arange(0, plength, Ts)
-    p_prime = np.vstack((rho*np.cos((s/rho)), rho*np.sin((s/rho)), np.zeros(len(s))))
-    
-    
-    x_prime = (pi - c)/rho
-
-    norm = np.linalg.norm(r)
-    
-    z_prime = r/norm
-
-    y_prime = np.cross(x_prime, z_prime, axis=0)
-    
-    R = np.concatenate((x_prime, y_prime, z_prime), axis=1)
-  
-    p = c + np.dot(R,p_prime)
-    dp = np.dot(R, np.vstack((-np.sin(s/rho), np.cos(s/rho), np.zeros(len(s)))))  
-    ddp = np.dot(R, np.vstack((-(1/rho)*np.cos(s/rho),-(1/rho)*np.sin(s/rho),np.zeros(len(s)))))
-    dddp = np.dot(R, np.vstack((np.sin(s/rho)/(np.power(rho,2)), -np.cos(s/rho)/(np.power(rho,2)), np.zeros(len(s))))) 
-
-    return p, dp, ddp
-
-
 def linear_path(pi, pf, Ts):# P, DP, DDP, DDDP, T):
     
     s = np.arange(0, np.linalg.norm(pf - pi), Ts)
@@ -145,6 +115,34 @@ def go_to_first_vertex(starting_angle, ending_angle, path, pf, Ts):
         path.append(waypoint)
 
 
+def circular_path(pi, pf, c,  Ts):#, c, P, DP, DDP,DDDP, T, flag):
+
+    rho = np.linalg.norm(pi-c)
+    r = np.cross(c - pf, c -pi, axis=0)#c-pf, c-pi)
+    
+    arc_angle = vecangle(c-pf, c-pi, r)
+    plength = rho*arc_angle
+        
+    s = np.arange(0, plength, Ts)
+    p_prime = np.vstack((rho*np.cos((s/rho)), rho*np.sin((s/rho)), np.zeros(len(s))))
+    
+    
+    x_prime = (pi - c)/rho
+
+    norm = np.linalg.norm(r)
+    
+    z_prime = r/norm
+
+    y_prime = np.cross(x_prime, z_prime, axis=0)
+    
+    R = np.concatenate((x_prime, y_prime, z_prime), axis=1)
+  
+    p = c + np.dot(R,p_prime)
+    #dp = np.dot(R, np.vstack((-np.sin(s/rho), np.cos(s/rho), np.zeros(len(s)))))  
+    #ddp = np.dot(R, np.vstack((-(1/rho)*np.cos(s/rho),-(1/rho)*np.sin(s/rho),np.zeros(len(s)))))
+    #dddp = np.dot(R, np.vstack((np.sin(s/rho)/(np.power(rho,2)), -np.cos(s/rho)/(np.power(rho,2)), np.zeros(len(s))))) 
+
+    return p, #dp, ddp
 
 def get_homogeneous_matrix(rot, trans):
         hom_trans = tf.transformations.quaternion_matrix(rot)
@@ -191,6 +189,63 @@ def only_vertices(vertices, path):
                 compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
                 print("Generating trajectory for vertex number ", i)
                 waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
+        
+        path.append(waypoint)
+
+def only_vertices_circ(vertices, path):
+    curr_pose = rtde_r.getActualTCPPose()
+
+    for i in range(0, len(np.transpose(vertices) - 3)):
+        print(vertices, i)
+        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
+
+        axis = [1, 0,1,0, 1]
+        angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
+        
+        curr_angles[axis[i]] += angles[i]
+        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+             
+        if i == 0:
+                print("Generating trajectory for vertex number ", i)
+                waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+        else:
+                print("Pivoting orientation for vertex number ", i)
+                #compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
+                #starting angle: last orientation in rotvec
+                #ending_Angle: next oientation incremented in euler angle
+                #pivoting_pose: last position which must be keep equal
+                pi = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
+                pf = np.array([[vertices[0, i + 1]], [vertices[1, i + 1]], [vertices[2, i + 1]]])
+                c = np.array([[vertices[0, 0]], [vertices[1, 0] + radius], [vertices[2, 0]]])
+                circ_path = circular_path(pi, pf, c,  0.01)
+        
+                #print(path)
+                r_start = Rot.from_rotvec([path[-1][3], path[-1][4], path[-1][5]])
+                r_end = Rot.from_euler('xyz', curr_angles)
+
+                times = np.linspace(0, 1, len(np.transpose(circ_path)))
+                key_rots = Rot.concatenate([r_start, r_end])
+
+                key_times = [0, 1]
+                slerp = Slerp(key_times, key_rots)
+
+                interp_rots = slerp(times)
+                o = interp_rots.as_rotvec()
+
+ 
+                circ_path = np.array(circ_path)
+                #print("ooo", len(np.transpose(circ_path)))
+               # print("ooo", len(o))
+                for j in range(0, len(o)):
+                    print("round", i)
+                    print(circ_path[0][0, j])#, i])
+                    print(circ_path[0][1, j])#, i])
+
+                    if i == 0:
+                        waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                    else:
+                        waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                    #path.append(waypoint)
         
         path.append(waypoint)
 
@@ -252,7 +307,7 @@ def logCallback(event):
     #     pub_reference_traj.publish(trajPose_msg)
     #     log_index += 1
     
-
+radius = 0.10
 if __name__ == '__main__':	
     try:
         rospy.init_node('Trajectory', anonymous=True)
@@ -290,13 +345,13 @@ if __name__ == '__main__':
             
             # y-axis in optitrack is pointing up
             data_from_optitrack_flatten = data_from_optitrack.to_numpy()
-            #data_from_optitrack_flatten[:,1] = data_from_optitrack.to_numpy()[1,1]
+            data_from_optitrack_flatten[:,1] = data_from_optitrack.to_numpy()[1,1]
 
             overall_data = np.append(overall_data, data_from_optitrack_flatten)
 
-            data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
-            data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
-            data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
+            # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
+            # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
+            # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
             ax.scatter(data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 1], data_from_optitrack_flatten[:, 2], c='r', marker='o', label=TRAJECTORY)
             
@@ -323,7 +378,7 @@ if __name__ == '__main__':
         vertices[1,:] = y_mean
 
         # offset in y for safety reasons
-        vertices[1,:] += 0.02
+        #vertices[1,:] += 0.0
         
 
         fig	 = plt.figure()
@@ -339,21 +394,28 @@ if __name__ == '__main__':
         merge = sum(overall_data, [0,0,0])
         #overall_data = np.hstack(overall_data)
         
-        
+        # vertices[0,0] = overall_data[10, 0] 
+        # vertices[1,0] = overall_data[10, 1]
+        # vertices[2,0] = overall_data[10, 2]
 
         # Transforming the trajectory for welding the object in frame ur_base
         (trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
         optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
         vertices_ur_base = apply_transformation(optitrack_to_link0_hom_trans, vertices)
+        vertices_ur_base[2,:] += 0.02
 
-        (trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
+        overall_data = np.append((overall_data), np.transpose(vertices))
+        overall_data = np.reshape(overall_data,(int(len(overall_data)/3),3))
+        #(trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
         optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
+
+        print("overall", overall_data)
         overall_data_ur_base = apply_transformation(optitrack_to_link0_hom_trans, np.transpose(overall_data))
 
         print("Ur_vertices:\n", vertices_ur_base)
         
 
-        exit()
+        
         
         Ts = 0.002
         rtde_frequency = 500.0
@@ -377,8 +439,10 @@ if __name__ == '__main__':
         path_all_points = []
 
         #Generiting trajectory passing only vertices
-        only_vertices(vertices_ur_base, path_only_vertex)
+        #only_vertices(vertices_ur_base, path_only_vertex)
+        only_vertices_circ(vertices, path_only_vertex)
 
+        exit()
         #Define first orientation
         curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
         curr_angles[1] += np.pi/6
@@ -450,6 +514,11 @@ if __name__ == '__main__':
         #ax.set_ylabel('\n' + r"$X$  [m]", fontsize=15, linespacing=3)
         #ax.set_zlabel('\n' + r"$Y$  [m]", fontsize=15, linespacing=3, rotation=90)
         plt.show()
+
+        print("overall ur base", overall_data_ur_base[0,:])
+        print("overall ur base", overall_data_ur_base[1,:])
+
+        print("overall ur base", overall_data_ur_base[2,:])
 
         
         
