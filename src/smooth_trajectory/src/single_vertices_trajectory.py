@@ -322,6 +322,8 @@ if __name__ == '__main__':
     
         rospy.loginfo("Welcome to the node!")
 
+        data_name = rospy.get_param('folder_name')
+        #rospy.set_param()
 
 
         # creating vertices container
@@ -334,8 +336,8 @@ if __name__ == '__main__':
             print("Generating vertex number ", i)
             
             #Getting data from bag
-            FOLDER = "vertex_" + str(i) + ".bag"
-            TRAJECTORY = "vertex_" + str(i)
+            FOLDER = data_name + "_" + str(i) + ".bag"
+            TRAJECTORY = data_name + "_" + str(i)
             rosbag_to_csv(DATA_BASE_PATH, FOLDER)
 
 
@@ -402,6 +404,8 @@ if __name__ == '__main__':
         (trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
         optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
         vertices_ur_base = apply_transformation(optitrack_to_link0_hom_trans, vertices)
+
+        # safety reasons
         vertices_ur_base[2,:] += 0.02
 
         overall_data = np.append((overall_data), np.transpose(vertices))

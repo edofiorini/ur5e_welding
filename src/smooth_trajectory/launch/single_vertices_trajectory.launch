@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="Trajectory" pkg="smooth_trajectory" type="single_vertices_trajectory.py" respawn="false" output="screen">
+    <param name="folder_name" value="vertex_"/>
+  </node>
+  
+  
+</launch>
