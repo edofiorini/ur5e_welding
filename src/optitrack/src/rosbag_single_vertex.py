@@ -20,7 +20,7 @@ if __name__ == '__main__':
         # Start recording.
         num_vertices = 4
         for i in range(0,num_vertices):
-            vertex_name = "vertex_occ_" + str(i)
+            vertex_name = "vertex_circ_" + str(i)
             command = "source " + record_script   
             input("============ Press `Enter` to START recording vertex number " + str(i) + " ============")
             p = subprocess.Popen([command % (vertex_name)], stdin=subprocess.PIPE, shell=True, cwd=record_folder, executable='/bin/bash')

@@ -193,10 +193,13 @@ def only_vertices(vertices, path):
         path.append(waypoint)
 
 def only_vertices_circ(vertices, path):
-    curr_pose = rtde_r.getActualTCPPose()
+    #curr_pose = rtde_r.getActualTCPPose()
+    curr_pose = [0.115, -0.132, 0.216, 2.253, -2.295, 0.077]
 
-    for i in range(0, len(np.transpose(vertices) - 3)):
-        print(vertices, i)
+    print(vertices)
+    for i in range(0, len(np.transpose(vertices))):
+       
+        print("Generating trajectory for vertex number ", i)
         curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
 
         axis = [1, 0,1,0, 1]
@@ -206,20 +209,21 @@ def only_vertices_circ(vertices, path):
         next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
              
         if i == 0:
-                print("Generating trajectory for vertex number ", i)
+                
                 waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
         else:
-                print("Pivoting orientation for vertex number ", i)
+                
                 #compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
                 #starting angle: last orientation in rotvec
                 #ending_Angle: next oientation incremented in euler angle
                 #pivoting_pose: last position which must be keep equal
-                pi = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
-                pf = np.array([[vertices[0, i + 1]], [vertices[1, i + 1]], [vertices[2, i + 1]]])
+                pi = np.array([[vertices[0, i-1]], [vertices[1, i-1]], [vertices[2, i-1]]])
+                pf = np.array([[vertices[0, i]], [vertices[1, i -1 ]], [vertices[2, i - 1]]])
                 c = np.array([[vertices[0, 0]], [vertices[1, 0] + radius], [vertices[2, 0]]])
-                circ_path = circular_path(pi, pf, c,  0.01)
-        
-                #print(path)
+                circ_path = circular_path(pi, pf, c,  0.001)
+                print(pi, pf)
+                print(circ_path)
+                
                 r_start = Rot.from_rotvec([path[-1][3], path[-1][4], path[-1][5]])
                 r_end = Rot.from_euler('xyz', curr_angles)
 
@@ -234,18 +238,15 @@ def only_vertices_circ(vertices, path):
 
  
                 circ_path = np.array(circ_path)
+               
                 #print("ooo", len(np.transpose(circ_path)))
                # print("ooo", len(o))
                 for j in range(0, len(o)):
-                    print("round", i)
-                    print(circ_path[0][0, j])#, i])
-                    print(circ_path[0][1, j])#, i])
-
                     if i == 0:
                         waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
                     else:
                         waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
-                    #path.append(waypoint)
+                    path.append(waypoint)
         
         path.append(waypoint)
 
@@ -307,7 +308,7 @@ def logCallback(event):
     #     pub_reference_traj.publish(trajPose_msg)
     #     log_index += 1
     
-radius = 0.10
+radius = 0.065
 if __name__ == '__main__':	
     try:
         rospy.init_node('Trajectory', anonymous=True)
@@ -322,7 +323,7 @@ if __name__ == '__main__':
     
         rospy.loginfo("Welcome to the node!")
 
-        data_name = rospy.get_param('folder_name')
+        data_name = rospy.get_param('Trajectory/folder_name')
         #rospy.set_param()
 
 
@@ -338,6 +339,8 @@ if __name__ == '__main__':
             #Getting data from bag
             FOLDER = data_name + "_" + str(i) + ".bag"
             TRAJECTORY = data_name + "_" + str(i)
+
+
             rosbag_to_csv(DATA_BASE_PATH, FOLDER)
 
 
@@ -422,29 +425,36 @@ if __name__ == '__main__':
         
         
         Ts = 0.002
-        rtde_frequency = 500.0
-        rtde_c = RTDEControl("192.168.137.130")# rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)
-        rtde_r = rtde_receive.RTDEReceiveInterface("192.168.137.130")
+        # rtde_frequency = 500.0
+        # rtde_c = RTDEControl("192.168.137.130")# rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)
+        # rtde_r = rtde_receive.RTDEReceiveInterface("192.168.137.130")
 
         velocity = 0.5
         acceleration = 0.5
         blend = 0.0067
 
-        # Go to "home demo" pose
-        waypoint_j = [el*np.pi/180 for el in [-1.20, -87.64, -86.19, -96.23, 91.22, -0.81]]
-        waypoint_j.extend([0.5, 0.5, 0.0])
-        rtde_c.moveJ([waypoint_j])
+        # # Go to "home demo" pose
+        # waypoint_j = [el*np.pi/180 for el in [-1.20, -87.64, -86.19, -96.23, 91.22, -0.81]]
+        # waypoint_j.extend([0.5, 0.5, 0.0])
+        # rtde_c.moveJ([waypoint_j])
 
         
-        #get current robot status
-        curr_pose = rtde_r.getActualTCPPose()
+        # #get current robot status
+        # curr_pose = rtde_r.getActualTCPPose()
 
         path_only_vertex = []
         path_all_points = []
 
         #Generiting trajectory passing only vertices
         #only_vertices(vertices_ur_base, path_only_vertex)
-        only_vertices_circ(vertices, path_only_vertex)
+        only_vertices_circ(vertices_ur_base, path_only_vertex)
+        
+        plot_here = np.asarray(path_only_vertex)
+        print(plot_here)
+        fig	 = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+        ax.scatter(plot_here[0, :], plot_here[1, :], c='red', marker='o', label='Acquired vertices', s=0.3)
+        plt.show()
 
         exit()
         #Define first orientation
