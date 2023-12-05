@@ -42,29 +42,6 @@ def vecangle(v1, v2, normal):
 
     return angle
 
-
-def linear_path(pi, pf, Ts):# P, DP, DDP, DDDP, T):
-    
-    s = np.arange(0, np.linalg.norm(pf - pi), Ts)
-    
-    p = pi + s*((pf - pi)/(np.linalg.norm(pf - pi)))
-    dp = np.ones((3, len(s)))*(pf - pi)/(np.linalg.norm(pf - pi))
-    ddp = np.zeros((3, len(s)))
-    dddp = np.zeros((3, len(s)))
-    
-    return p, dp, ddp
-
-def compute_trajectory(pi, pf, path, Ts):
-
-    p, dp, ddp = linear_path(pi, pf, Ts)
-    for i in range(0,len(np.transpose(p))):
-        if i == 0:
-            waypoint = [p[0,i], p[1,i], p[2,i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]
-        else:
-            waypoint = [p[0,i], p[1,i], p[2,i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, blend]
-        path.append(waypoint)
-    #return path
-
 def compute_orientation(starting_angle, ending_angle, path, pivoting_pos):
     #starting angle: last orientation in rotvec
     #ending_Angle: next oientation incremented in euler angle
@@ -87,31 +64,6 @@ def compute_orientation(starting_angle, ending_angle, path, pivoting_pos):
                 waypoint = [pivoting_pos[0], pivoting_pos[1], pivoting_pos[2], o[i, 0], o[i, 1], o[i, 2], velocity, acceleration, 0.0]
         else:
                 waypoint = [pivoting_pos[0], pivoting_pos[1], pivoting_pos[2], o[i, 0], o[i, 1], o[i, 2], velocity, acceleration, 0.0]
-        path.append(waypoint)
-
-def go_to_first_vertex(starting_angle, ending_angle, path, pf, Ts):
-     
-    r_start = Rot.from_rotvec([starting_angle[3], starting_angle[4], starting_angle[5]])
-    r_end = Rot.from_euler('xyz', ending_angle)
-
-    times = np.arange(0, 1, 0.001)
-    key_rots = Rot.concatenate([r_start, r_end])
-
-    key_times = [0, 1]
-    slerp = Slerp(key_times, key_rots)
-
-    interp_rots = slerp(times)
-    o = interp_rots.as_rotvec()
-
-    pi = np.array([[starting_angle[0]], [starting_angle[1]], [starting_angle[2]]])
-    p, dp, ddp = linear_path(pi, pf, Ts)
-    
-    
-    for i in range(0, len(o)):
-        if i == 0:
-                waypoint = [p[0,i], p[1,i], p[2,i], o[i, 0], o[i, 1], o[i, 2], velocity, acceleration, 0.0]
-        else:
-                waypoint = [p[0,i], p[1,i], p[2,i], o[i, 0], o[i, 1], o[i, 2], velocity, acceleration, blend]
         path.append(waypoint)
 
 
@@ -196,7 +148,6 @@ def only_vertices_circ(vertices, path):
     #curr_pose = rtde_r.getActualTCPPose()
     curr_pose = [0.115, -0.132, 0.216, 2.253, -2.295, 0.077]
 
-    print(vertices)
     for i in range(0, len(np.transpose(vertices))):
        
         print("Generating trajectory for vertex number ", i)
@@ -210,45 +161,39 @@ def only_vertices_circ(vertices, path):
              
         if i == 0:
                 
-                waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+            waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+            path.append(waypoint)
+
         else:
                 
-                #compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
-                #starting angle: last orientation in rotvec
-                #ending_Angle: next oientation incremented in euler angle
-                #pivoting_pose: last position which must be keep equal
-                pi = np.array([[vertices[0, i-1]], [vertices[1, i-1]], [vertices[2, i-1]]])
-                pf = np.array([[vertices[0, i]], [vertices[1, i -1 ]], [vertices[2, i - 1]]])
-                c = np.array([[vertices[0, 0]], [vertices[1, 0] + radius], [vertices[2, 0]]])
-                circ_path = circular_path(pi, pf, c,  0.001)
-                print(pi, pf)
-                print(circ_path)
-                
-                r_start = Rot.from_rotvec([path[-1][3], path[-1][4], path[-1][5]])
-                r_end = Rot.from_euler('xyz', curr_angles)
 
-                times = np.linspace(0, 1, len(np.transpose(circ_path)))
-                key_rots = Rot.concatenate([r_start, r_end])
+            pi = np.array([[vertices[0, i-1]], [vertices[1, i-1]], [vertices[2, i-1]]])
+            pf = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
+            c = np.array([[vertices[0, 0] + radius], [vertices[1, 0]], [vertices[2, 0]]])
+            circ_path = circular_path(pi, pf, c,  0.001)
+            print("Pi:", pi)
+            print("Pf:", pf)
+            print("Path:", circ_path)
+            
+            r_start = Rot.from_rotvec([path[-1][3], path[-1][4], path[-1][5]])
+            r_end = Rot.from_euler('xyz', curr_angles)
+            times = np.linspace(0, 1, len(np.transpose(circ_path)))
+            key_rots = Rot.concatenate([r_start, r_end])
+            key_times = [0, 1]
+            slerp = Slerp(key_times, key_rots)
+            interp_rots = slerp(times)
+            o = interp_rots.as_rotvec()
 
-                key_times = [0, 1]
-                slerp = Slerp(key_times, key_rots)
 
-                interp_rots = slerp(times)
-                o = interp_rots.as_rotvec()
-
- 
-                circ_path = np.array(circ_path)
-               
-                #print("ooo", len(np.transpose(circ_path)))
-               # print("ooo", len(o))
-                for j in range(0, len(o)):
-                    if i == 0:
-                        waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
-                    else:
-                        waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
-                    path.append(waypoint)
-        
-        path.append(waypoint)
+            # from tuple to array
+            circ_path = np.array(circ_path)
+            
+            for j in range(0, len(o)):
+                if i == 0:
+                    waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                else:
+                    waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                path.append(waypoint)
 
 def publish_trajectory_to_RVIZ(pub, trajectory):
     ps = PoseArray()
@@ -446,68 +391,25 @@ if __name__ == '__main__':
         path_all_points = []
 
         #Generiting trajectory passing only vertices
-        #only_vertices(vertices_ur_base, path_only_vertex)
-        only_vertices_circ(vertices_ur_base, path_only_vertex)
+
+        if data_name == "vertex_circ":
+            only_vertices_circ(vertices_ur_base, path_only_vertex)
+        else:
+            only_vertices(vertices_ur_base, path_only_vertex)
         
         plot_here = np.asarray(path_only_vertex)
-        print(plot_here)
+    
         fig	 = plt.figure()
         ax = fig.add_subplot(111, projection="3d")
         ax.scatter(plot_here[0, :], plot_here[1, :], c='red', marker='o', label='Acquired vertices', s=0.3)
         plt.show()
 
         exit()
-        #Define first orientation
-        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-        curr_angles[1] += np.pi/6
-        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-        #1
-        compute_orientation(curr_pose, curr_angles, path_all_points, curr_pose)
 
-        pi = np.array([[vertices_ur_base[0,0]], [vertices_ur_base[1,0]], [vertices_ur_base[2,0]]])
-        pf = np.array([[vertices_ur_base[0,1]], [vertices_ur_base[1,1]], [vertices_ur_base[2,1]]])
-        #go_to_first_vertex(curr_pose, curr_angles, path_only_vertex, pi, Ts)
-        compute_trajectory(pi, pf, path_all_points, Ts)
-
-        # 2
-        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-        curr_angles[0] -= np.pi/6
-        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-        compute_orientation(path_all_points[-1], curr_angles, path_all_points, path_all_points[-1])
-        pi = np.array([[vertices_ur_base[0,1]], [vertices_ur_base[1,1]], [vertices_ur_base[2,1]]])
-        pf = np.array([[vertices_ur_base[0,2]], [vertices_ur_base[1,2]], [vertices_ur_base[2,2]]])
-        compute_trajectory(pi, pf, path_all_points, Ts)
-
-        # 3
-        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-        curr_angles[1] -= np.pi/6
-        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-        compute_orientation(path_all_points[-1], curr_angles, path_all_points, path_all_points[-1])
-        pi = np.array([[vertices_ur_base[0,2]], [vertices_ur_base[1,2]], [vertices_ur_base[2,2]]])
-        pf = np.array([[vertices_ur_base[0,3]], [vertices_ur_base[1,3]], [vertices_ur_base[2,3]]])
-        compute_trajectory(pi, pf, path_all_points, Ts)
-
-        # 4
-        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-        curr_angles[0] += np.pi/6
-        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-        compute_orientation(path_all_points[-1], curr_angles, path_all_points, path_all_points[-1])
-        pi = np.array([[vertices_ur_base[0,3]], [vertices_ur_base[1,3]], [vertices_ur_base[2,3]]])
-        pf = np.array([[vertices_ur_base[0,4]], [vertices_ur_base[1,4]], [vertices_ur_base[2,4]]])
-        compute_trajectory(pi, pf, path_all_points, Ts)
 
         
         publish_trajectory_to_RVIZ(pub_rviz, path_only_vertex)
-        
-        # FOLDER = "robot_pose.bag"
-        # TRAJECTORY = "robot_pose"
-        # #rosbag_to_csv(DATA_BASE_PATH, FOLDER)
-        # df = create_data_frame(DATA_BASE_PATH, TRAJECTORY)
-        
-
-        # data_from_robot = df.loc[:,["pose.position.x", "pose.position.y", "pose.position.z"]]
-        # data_from_robot = data_from_robot.to_numpy()
-        # print(data_from_robot)
+    
         
         plot_traj = np.asarray(path_only_vertex)
         
@@ -529,10 +431,6 @@ if __name__ == '__main__':
         #ax.set_zlabel('\n' + r"$Y$  [m]", fontsize=15, linespacing=3, rotation=90)
         plt.show()
 
-        print("overall ur base", overall_data_ur_base[0,:])
-        print("overall ur base", overall_data_ur_base[1,:])
-
-        print("overall ur base", overall_data_ur_base[2,:])
 
         
         

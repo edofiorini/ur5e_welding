@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="Rosbag_record" pkg="optitrack" type="rosbag_single_vertex.py" respawn="false" output="screen">
+    <param name="folder_name" value="vertex_circ"/>
+  </node>
+  
+  
+</launch>
