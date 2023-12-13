@@ -169,7 +169,7 @@ def only_vertices_circ(vertices, path):
 
             pi = np.array([[vertices[0, i-1]], [vertices[1, i-1]], [vertices[2, i-1]]])
             pf = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
-            c = np.array([[vertices[0, 0] + radius], [vertices[1, 0]], [vertices[2, 0]]])
+            c = np.array([[vertices[0, 0]], [vertices[1, 0] + radius], [vertices[2, 0]]])
             circ_path = circular_path(pi, pf, c,  0.001)
             print("Pi:", pi)
             print("Pf:", pf)
@@ -194,6 +194,69 @@ def only_vertices_circ(vertices, path):
                 else:
                     waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
                 path.append(waypoint)
+
+def mixed_vertices(vertices, path, motion_sequence):
+    #curr_pose = rtde_r.getActualTCPPose()
+    curr_pose = [0.115, -0.132, 0.216, 2.253, -2.295, 0.077]
+
+    for i in range(0, len(np.transpose(vertices))):
+       
+        print("Generating trajectory for vertex number ", i)
+        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
+
+        axis = [1, 0, 1, 0, 1]
+        angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
+        
+        curr_angles[axis[i]] += angles[i]
+        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+             
+        if i == 0:
+                
+            waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+            path.append(waypoint)
+
+        else:
+                
+            if motion_sequence[i-1] == 0:
+                
+                waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+                path.append(waypoint)
+
+            elif motion_sequence[i-1] == 2:
+                print("Pivoting orientation for vertex number ", i)
+                compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
+                print("Generating trajectory for vertex number ", i)
+                waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
+                path.append(waypoint)
+
+            else:
+                pi = np.array([[vertices[0, i-1]], [vertices[1, i-1]], [vertices[2, i-1]]])
+                pf = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
+                c = np.array([[vertices[0, 0] + radius], [vertices[1, 0]], [vertices[2, 0]]])
+                circ_path = circular_path(pi, pf, c,  0.001)
+                print("Pi:", pi)
+                print("Pf:", pf)
+                print("Path:", circ_path)
+
+                r_start = Rot.from_rotvec([path[-1][3], path[-1][4], path[-1][5]])
+                r_end = Rot.from_euler('xyz', curr_angles)
+                times = np.linspace(0, 1, len(np.transpose(circ_path)))
+                key_rots = Rot.concatenate([r_start, r_end])
+                key_times = [0, 1]
+                slerp = Slerp(key_times, key_rots)
+                interp_rots = slerp(times)
+                o = interp_rots.as_rotvec()
+
+
+                # from tuple to array
+                circ_path = np.array(circ_path)
+
+                for j in range(0, len(o)):
+                    if i == 0:
+                        waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                    else:
+                        waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                    path.append(waypoint)
 
 def publish_trajectory_to_RVIZ(pub, trajectory):
     ps = PoseArray()
@@ -394,14 +457,18 @@ if __name__ == '__main__':
 
         if data_name == "vertex_circ":
             only_vertices_circ(vertices_ur_base, path_only_vertex)
-        else:
+        elif data_name == "vertex":
             only_vertices(vertices_ur_base, path_only_vertex)
+        else:
+            motion_sequence = [0, 1, 2, 0, 1, 0] # 0 is line, 1 is circle
+            mixed_vertices(vertices_ur_base, path_only_vertex, motion_sequence)
+             
         
         plot_here = np.asarray(path_only_vertex)
-    
+        print("here", plot_here[:, 0])
         fig	 = plt.figure()
         ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(plot_here[0, :], plot_here[1, :], c='red', marker='o', label='Acquired vertices', s=0.3)
+        ax.scatter(plot_here[:, 0], plot_here[:, 1], c='red', marker='o', label='Acquired vertices', s=0.3)
         plt.show()
 
         exit()
