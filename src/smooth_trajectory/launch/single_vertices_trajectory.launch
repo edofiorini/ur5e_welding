@@ -2,8 +2,13 @@
 <launch>
 
   <node name="Trajectory" pkg="smooth_trajectory" type="single_vertices_trajectory.py" respawn="false" output="screen">
-    <param name="folder_name" value="vertex_circ"/>
+    <param name="object_type" type="string" value="linear"/>
+    <param name="folder_name" value="vertex_rec"/>
+    <param name="show_single_vertex_plot" type="bool" value="true"/>
+    <param name="show_all_vertices_plot" type="bool" value="true"/>
+    <param name="csv_ref_name" value="ref_data.csv"/>
+
   </node>
   
-  
+
 </launch>

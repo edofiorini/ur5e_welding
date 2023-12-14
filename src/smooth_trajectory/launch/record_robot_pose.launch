@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="robot_pose_subscriber_node" pkg="smooth_trajectory" type="record_robot_pose.py" respawn="false" output="screen">
+    <param name="csv_name" type="string" value="pose_data.csv"/>
+
+  </node>
+  
+  
+</launch>

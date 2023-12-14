@@ -13,13 +13,15 @@ if __name__ == '__main__':
         rospy.init_node('Rosbag_record')
         rospy.loginfo("Welcome to Rosbag_record node!")
         folder_name = rospy.get_param("Rosbag_record/folder_name")
+        num_vertices = rospy.get_param("Rosbag_record/num_vertices")
+
         dirname = os.path.dirname(__file__)
         record_script = os.path.join(dirname, 'record_single_vertex.sh %s')
 
         record_folder = os.path.join(os.path.dirname(os.path.dirname(dirname)), 'smooth_trajectory/src/vertices_data')
 
         # Start recording.
-        num_vertices = 4
+        #num_vertices = 4
         for i in range(0,num_vertices):
             vertex_name = folder_name + "_" + str(i)
             command = "source " + record_script   
