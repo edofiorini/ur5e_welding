@@ -1,30 +1,25 @@
 #!/usr/bin/env python3
 
 import rospy
-import std_msgs.msg
 from geometry_msgs.msg import PoseStamped, Pose, PoseArray
 import numpy as np
-import copy
 import os
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
-from CAD_generator import*
-from data_CAD_registration import*
 from utils_only_vertices import*
 import tf
-from config import*
 from scipy.spatial.transform import Slerp 
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from rtde_control import RTDEControlInterface as RTDEControl
 import rtde_receive
 import numpy as np
-import math
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 from scipy.spatial.transform import Rotation as Rot
 from sklearn import datasets, linear_model
+import csv
 
 plt.style.use('default')
 
@@ -221,8 +216,6 @@ def publish_trajectory_to_RVIZ(pub, trajectory):
 
 def logCallback(event):
     tcpPose_msg = PoseStamped()
-    trajPose_msg = PoseStamped()
-    global log_index
 
     tcpPose = rtde_r.getActualTCPPose()
     quat = Rot.from_rotvec([tcpPose[3], tcpPose[4], tcpPose[5]]).as_quat()
@@ -236,26 +229,32 @@ def logCallback(event):
     tcpPose_msg.pose.orientation.z = quat[2]
     tcpPose_msg.pose.orientation.w = quat[3]
     pub_current_robot_pose.publish(tcpPose_msg)
-
-    if log_index < (len(path_all_points) - 1):
-        if log_index == 0:
-            #print("sleep")
-            rospy.sleep(2)
-        #print("in")
-        
-        quat = Rot.from_rotvec([path_all_points[log_index][3], path_all_points[log_index][4], path_all_points[log_index][5]]).as_quat()
-        trajPose_msg.header.stamp = rospy.Time.now()
-        trajPose_msg.header.frame_id = "ur/base"
-        trajPose_msg.pose.position.x = path_all_points[log_index][0]
-        trajPose_msg.pose.position.y = path_all_points[log_index][1]
-        trajPose_msg.pose.position.z = path_all_points[log_index][2]
-        trajPose_msg.pose.orientation.x = quat[0]
-        trajPose_msg.pose.orientation.y = quat[1]
-        trajPose_msg.pose.orientation.z = quat[2]
-        trajPose_msg.pose.orientation.w = quat[3]
-        pub_reference_traj.publish(trajPose_msg)
-        log_index += 1
     
+def write_ref_to_csv(path):
+        print("Writing csv!")
+        # Extract position data from the PoseStamped message
+        for i in range(0, len((path))):
+            x = path[i, 0]
+            y = path[i, 1]
+            z = path[i, 2]
+
+            # Write the data to the CSV file
+            csv_writer.writerow([x, y, z])
+            csv_file.flush()  # Ensure data is written immediately
+
+
+def write_vertices_to_csv(vertices):
+        print("Writing csv!")
+
+        for i in range(0, len(np.transpose(vertices))):
+            vertex_x = vertices[0, i]
+            vertex_y = vertices[1, i]
+            vertex_z = vertices[2, i]
+
+            # Write the data to the CSV file
+            csv_writer_vert.writerow([vertex_x, vertex_y, vertex_z])
+            csv_file_vert.flush()  # Ensure data is written immediately
+
 
 if __name__ == '__main__':	
     try:
@@ -271,7 +270,12 @@ if __name__ == '__main__':
     
         rospy.loginfo("Welcome to the node!")
 
-
+        data_name = rospy.get_param('Trajectory/folder_name')
+        single_vertex_plot = rospy.get_param('Trajectory/show_single_vertex_plot')
+        all_vertices_plot = rospy.get_param('Trajectory/show_all_vertices_plot')
+        csv_ref_name = rospy.get_param('Trajectory/csv_ref_name')
+        VERTICES_NUM = rospy.get_param('Trajectory/vertices_num')
+        DATA_BASE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'vertices_data')
 
         # creating vertices container
         overall_data = np.array([])
@@ -280,11 +284,11 @@ if __name__ == '__main__':
             print("Generating vertex number ", i)
             
             #Getting data from bag
-            FOLDER = "line_" + str(i) + ".bag"
-            TRAJECTORY = "line_" + str(i)
+            FOLDER = data_name + "_" + str(i) + ".bag"
+            TRAJECTORY = data_name + "_" + str(i)
             rosbag_to_csv(DATA_BASE_PATH, FOLDER)
 
-
+            print("###", DATA_BASE_PATH, TRAJECTORY)
             df = create_data_frame(DATA_BASE_PATH, TRAJECTORY)
 
             data_from_optitrack = df.loc[:,["pose.position.x", "pose.position.y", "pose.position.z"]]  
@@ -295,9 +299,9 @@ if __name__ == '__main__':
 
             overall_data = np.append(overall_data, data_from_optitrack_flatten)
 
-            data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
-            data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
-            data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
+            # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
+            # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
+            # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
 
             X = data_from_optitrack_flatten[:, 0]
@@ -320,15 +324,18 @@ if __name__ == '__main__':
             all_waypoints[2, i*10:i*10+10] = line_z_ransac
             
 
-            lw = 2
-            plt.scatter(data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 2], c='r', marker='o', label=TRAJECTORY)
-            plt.scatter(X[inlier_mask], z[inlier_mask], color="yellowgreen", marker=".", label="Inliers")
-            plt.scatter(X[outlier_mask], z[outlier_mask], color="gold", marker=".", label="Outliers")
-            plt.plot(line_X_new, line_z_ransac, color="cornflowerblue", linewidth=lw, label="RANSAC regressor")
-            plt.legend(loc="lower right")
-            plt.xlabel("Input")
-            plt.ylabel("Response")
-            plt.show()
+            
+
+            if single_vertex_plot:
+                lw = 2
+                plt.scatter(data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 2], c='r', marker='o', label=TRAJECTORY)
+                plt.scatter(X[inlier_mask], z[inlier_mask], color="yellowgreen", marker=".", label="Inliers")
+                plt.scatter(X[outlier_mask], z[outlier_mask], color="gold", marker=".", label="Outliers")
+                plt.plot(line_X_new, line_z_ransac, color="cornflowerblue", linewidth=lw, label="RANSAC regressor")
+                plt.legend(loc="lower right")
+                plt.xlabel("Input")
+                plt.ylabel("Response")
+                plt.show()
 
         
         overall_data = np.reshape(overall_data,(int(len(overall_data)/3),3))
@@ -340,10 +347,11 @@ if __name__ == '__main__':
         # offset in y for safety reasons
         all_waypoints[1,:] += 0.02
         
-        fig	 = plt.figure()
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(all_waypoints[0, :], all_waypoints[1, :], all_waypoints[2, :], c='r', marker='o', label=TRAJECTORY)
-        plt.show()
+        if all_vertices_plot:
+            fig	 = plt.figure()
+            ax = fig.add_subplot(111, projection="3d")
+            ax.scatter(all_waypoints[0, :], all_waypoints[1, :], all_waypoints[2, :], c='r', marker='o', label=TRAJECTORY)
+            plt.show()
 
         print("Generated vertices w.r.t. optitrack frame:\n", all_waypoints)
         
@@ -359,7 +367,8 @@ if __name__ == '__main__':
 
         print("ur_vertices", all_waypoints_ur_base)
         
-        exit()
+        
+        
         Ts = 0.002
         rtde_frequency = 500.0
         rtde_c = RTDEControl("192.168.137.130")# rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)
@@ -379,61 +388,40 @@ if __name__ == '__main__':
         curr_pose = rtde_r.getActualTCPPose()
 
         path_only_vertex = []
-        path_all_points = []
+
 
         #Generiting trajectory passing only vertices
         only_vertices(all_waypoints_ur_base, path_only_vertex)
 
-        # #Define first orientation
-        # curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-        # curr_angles[1] += np.pi/6
-        # next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-        # #1
-        # compute_orientation(curr_pose, curr_angles, path_all_points, curr_pose)
+        dirname = os.path.dirname(__file__)
+        # Set the path to the folder where you want to save the CSV file
+        folder_path = os.path.join(os.path.dirname(os.path.dirname(dirname)), 'smooth_trajectory/src/csv')
+        file_path = os.path.join(folder_path, csv_ref_name)
+        file_path_vertices = os.path.join(folder_path, 'vertices_complete_line.csv')
+        
+        # Create or open the CSV file for writing
+        csv_file = open(file_path, 'w')
+        csv_writer = csv.writer(csv_file)
 
-        # pi = np.array([[vertices_ur_base[0,0]], [vertices_ur_base[1,0]], [vertices_ur_base[2,0]]])
-        # pf = np.array([[vertices_ur_base[0,1]], [vertices_ur_base[1,1]], [vertices_ur_base[2,1]]])
-        # #go_to_first_vertex(curr_pose, curr_angles, path_only_vertex, pi, Ts)
-        # compute_trajectory(pi, pf, path_all_points, Ts)
+        csv_file_vert = open(file_path_vertices, 'w')
+        csv_writer_vert = csv.writer(csv_file_vert)
 
-        # # 2
-        # curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-        # curr_angles[0] -= np.pi/6
-        # next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-        # compute_orientation(path_all_points[-1], curr_angles, path_all_points, path_all_points[-1])
-        # pi = np.array([[vertices_ur_base[0,1]], [vertices_ur_base[1,1]], [vertices_ur_base[2,1]]])
-        # pf = np.array([[vertices_ur_base[0,2]], [vertices_ur_base[1,2]], [vertices_ur_base[2,2]]])
-        # compute_trajectory(pi, pf, path_all_points, Ts)
+        # Write header to CSV file
+        csv_writer.writerow(['x', 'y', 'z', 'vertex_x', 'vertex_y', 'vertex_z'])
+        csv_writer_vert.writerow(['vertex_x', 'vertex_y', 'vertex_z'])
 
-        # # 3
-        # curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-        # curr_angles[1] -= np.pi/6
-        # next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-        # compute_orientation(path_all_points[-1], curr_angles, path_all_points, path_all_points[-1])
-        # pi = np.array([[vertices_ur_base[0,2]], [vertices_ur_base[1,2]], [vertices_ur_base[2,2]]])
-        # pf = np.array([[vertices_ur_base[0,3]], [vertices_ur_base[1,3]], [vertices_ur_base[2,3]]])
-        # compute_trajectory(pi, pf, path_all_points, Ts)
+        plot_path_array = np.asarray(path_only_vertex)
+        
+        fig	 = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+        ax.scatter(plot_path_array[:, 0], plot_path_array[:, 1], c='red', marker='o', label='Acquired vertices', s=0.3)
+        plt.show()
 
-        # # 4
-        # curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-        # curr_angles[0] += np.pi/6
-        # next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-        # compute_orientation(path_all_points[-1], curr_angles, path_all_points, path_all_points[-1])
-        # pi = np.array([[vertices_ur_base[0,3]], [vertices_ur_base[1,3]], [vertices_ur_base[2,3]]])
-        # pf = np.array([[vertices_ur_base[0,4]], [vertices_ur_base[1,4]], [vertices_ur_base[2,4]]])
-        # compute_trajectory(pi, pf, path_all_points, Ts)
-
+        write_ref_to_csv(plot_path_array)
+        write_vertices_to_csv(all_waypoints_ur_base)
         
         publish_trajectory_to_RVIZ(pub_rviz, path_only_vertex)
-        # FOLDER = "robot_pose.bag"
-        # TRAJECTORY = "robot_pose"
-        # rosbag_to_csv(DATA_BASE_PATH, FOLDER)
-        # df = create_data_frame(DATA_BASE_PATH, TRAJECTORY)
-        
-
-        # data_from_robot = df.loc[:,["pose.position.x", "pose.position.y", "pose.position.z"]]
-        # data_from_robot = data_from_robot.to_numpy()
-        # print(data_from_robot)
+ 
         
         plot_traj = np.asarray(path_only_vertex)
         

@@ -11,7 +11,7 @@ import seaborn as sns
 from sklearn.linear_model import LinearRegression
 import set_configuration
 #from set_configuration import*
-from config import*
+#from config import*
 
 plt.style.use('seaborn')
 

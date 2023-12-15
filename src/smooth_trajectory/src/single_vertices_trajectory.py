@@ -4,17 +4,13 @@ import rospy
 import std_msgs.msg
 from geometry_msgs.msg import PoseStamped, Pose, PoseArray
 import numpy as np
-import copy
 import os
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
-from CAD_generator import*
-from data_CAD_registration import*
 from utils_only_vertices import*
 import tf
-from config import*
 from scipy.spatial.transform import Slerp 
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from rtde_control import RTDEControlInterface as RTDEControl
@@ -229,8 +225,8 @@ def circular_vertices(vertices, path):
 
             pi = np.array([[vertices[0, i-1]], [vertices[1, i-1]], [vertices[2, i-1]]])
             pf = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
-            c = np.array([[vertices[0, 0]], [vertices[1, 0] + radius], [vertices[2, 0]]])
-            circ_path = circular_path(pi, pf, c,  0.001)
+            c = np.array([[vertices[0, 0]], [vertices[1, 0] + radius], [vertices[2, 0]]]) #robot + radius y
+            circ_path = circular_path(pi, pf, c,  Ts)
             print("Pi:", pi)
             print("Pf:", pf)
             print("Path:", circ_path)
@@ -266,12 +262,13 @@ def mixed_vertices(vertices, path, motion_sequence):
 
         axis = [1, 0, 1, 0, 1]
         angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
-        
-        curr_angles[axis[i]] += angles[i]
-        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+        j = 0
+
              
         if i == 0:
-                
+            curr_angles[axis[j]] += angles[j]
+            next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+            j += 1
             waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
             path.append(waypoint)
 
@@ -279,21 +276,34 @@ def mixed_vertices(vertices, path, motion_sequence):
                 
             if motion_sequence[i-1] == 0:
                 
+                curr_angles[axis[j-1]] += angles[j-1]
+                next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
                 waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
                 path.append(waypoint)
 
             elif motion_sequence[i-1] == 2:
-                print("Pivoting orientation for vertex number ", i)
+
+                curr_angles[axis[j]] += angles[j]
+                next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+                j += 1
+                
                 compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
-                print("Generating trajectory for vertex number ", i)
+                
                 waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
                 path.append(waypoint)
 
             else:
+
+                curr_angles[axis[j]] += angles[j]
+                next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+                j += 1
                 pi = np.array([[vertices[0, i-1]], [vertices[1, i-1]], [vertices[2, i-1]]])
                 pf = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
-                c = np.array([[vertices[0, 0] + radius], [vertices[1, 0]], [vertices[2, 0]]])
-                circ_path = circular_path(pi, pf, c,  0.001)
+                if i == 2:
+                    c = np.array([[vertices[0, i-1]], [vertices[1, i-1]  + radius], [vertices[2, i-1]]])
+                else:
+                    c = np.array([[vertices[0, i-1]], [vertices[1, i-1]  - radius], [vertices[2, i-1]]]) 
+                circ_path = circular_path(pi, pf, c,  Ts)
                 print("Pi:", pi)
                 print("Pf:", pf)
                 print("Path:", circ_path)
@@ -317,6 +327,7 @@ def mixed_vertices(vertices, path, motion_sequence):
                     else:
                         waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
                     path.append(waypoint)
+        print("## Waypoint ##", waypoint)
 
 def publish_trajectory_to_RVIZ(pub, trajectory):
     ps = PoseArray()
@@ -341,8 +352,6 @@ def publish_trajectory_to_RVIZ(pub, trajectory):
 
 def logCallback(event):
     tcpPose_msg = PoseStamped()
-    trajPose_msg = PoseStamped()
-    global log_index
 
     tcpPose = rtde_r.getActualTCPPose()
     quat = Rot.from_rotvec([tcpPose[3], tcpPose[4], tcpPose[5]]).as_quat()
@@ -382,7 +391,7 @@ def write_vertices_to_csv(vertices):
             csv_writer_vert.writerow([vertex_x, vertex_y, vertex_z])
             csv_file_vert.flush()  # Ensure data is written immediately
 
-radius = 0.065
+
 if __name__ == '__main__':	
     try:
         rospy.init_node('Trajectory', anonymous=True)
@@ -393,7 +402,7 @@ if __name__ == '__main__':
         pub_rviz = rospy.Publisher("smooth_trajectory_RVIZ", PoseArray, queue_size=1)
         pub_current_robot_pose = rospy.Publisher("robot_position", PoseStamped, queue_size=1)
         pub_reference_traj = rospy.Publisher("reference_trajectory", PoseStamped, queue_size=1)
-        log_index = 0
+        
     
         rospy.loginfo("Welcome to the node!")
 
@@ -402,7 +411,9 @@ if __name__ == '__main__':
         single_vertex_plot = rospy.get_param('Trajectory/show_single_vertex_plot')
         all_vertices_plot = rospy.get_param('Trajectory/show_all_vertices_plot')
         csv_ref_name = rospy.get_param('Trajectory/csv_ref_name')
-
+        radius = rospy.get_param('Trajectory/circ_radius')
+        VERTICES_NUM = rospy.get_param('Trajectory/vertices_num')
+        DATA_BASE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'vertices_data')
 
         # creating vertices container
         vertices = np.empty([3, VERTICES_NUM + 1])
@@ -429,9 +440,9 @@ if __name__ == '__main__':
 
             overall_data = np.append(overall_data, data_from_optitrack_flatten)
 
-            # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
-            # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
-            # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
+            data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
+            data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
+            data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
             
             vertex_median = np.median(data_from_optitrack_flatten, axis=0)
@@ -463,10 +474,11 @@ if __name__ == '__main__':
 
         if all_vertices_plot:
             fig	 = plt.figure()
-            ax = fig.add_subplot(111, projection="3d")
-            ax.scatter(vertices[0, :], vertices[1, :], vertices[2, :], c='b', marker='o', label='Generated vertices')
+            ax = fig.add_subplot(111)
+            ax.scatter(vertices[0, :], vertices[2, :], c='b', marker='o', label='Generated vertices')
             plt.show()
 
+        
         print("Generated vertices w.r.t. optitrack frame:\n", vertices)
         
         # Transforming the trajectory for welding the object in frame ur_base
@@ -527,7 +539,7 @@ if __name__ == '__main__':
         csv_writer.writerow(['x', 'y', 'z', 'vertex_x', 'vertex_y', 'vertex_z'])
         csv_writer_vert.writerow(['vertex_x', 'vertex_y', 'vertex_z'])
 
-
+        
         if object_type == "circular":
             circular_vertices(vertices_ur_base, path_only_vertex)
         elif object_type == "linear":
@@ -542,14 +554,17 @@ if __name__ == '__main__':
         plot_path_array = np.asarray(path_only_vertex)
         
         fig	 = plt.figure()
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(plot_path_array[:, 0], plot_path_array[:, 1], c='red', marker='o', label='Acquired vertices', s=0.3)
+        ax = fig.add_subplot(111)
+        ax.scatter(plot_path_array[:, 0], plot_path_array[:, 1], c='red', marker='o', label='Acquired vertices', s=10)
+        ax.scatter(vertices_ur_base[0, :], vertices_ur_base[1, :], c='blue', marker='o', label='Acquired vertices', s=2)
+
         plt.show()
 
+        exit()
         write_ref_to_csv(plot_path_array)
         write_vertices_to_csv(vertices_ur_base)
         
-        
+        exit()
         publish_trajectory_to_RVIZ(pub_rviz, path_only_vertex)
     
         plot_traj = np.asarray(path_only_vertex)
@@ -557,7 +572,7 @@ if __name__ == '__main__':
         fig	 = plt.figure()
         ax = fig.add_subplot(111)
         ax.scatter(vertices_ur_base[0, :]*1000, vertices_ur_base[1, :]*1000, c='green', marker='o', label='Detected_vertices', s=5)
-        ax.scatter(overall_data_ur_base[0, :]*1000, overall_data_ur_base[1, :]*1000, c='red', marker='o', label='Acquired vertices', s=0.3)
+        #ax.scatter(overall_data_ur_base[0, :]*1000, overall_data_ur_base[1, :]*1000, c='red', marker='o', label='Acquired vertices', s=0.3)
         #ax.scatter(data_from_robot[:, 0]*1000, data_from_robot[:, 1]*1000, c='blue', marker='o', label='Robot pose', s=1)
 
 

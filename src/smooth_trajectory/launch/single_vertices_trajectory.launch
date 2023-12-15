@@ -2,13 +2,15 @@
 <launch>
 
   <node name="Trajectory" pkg="smooth_trajectory" type="single_vertices_trajectory.py" respawn="false" output="screen">
-    <param name="object_type" type="string" value="linear"/>
-    <param name="folder_name" value="vertex_rec"/>
+    <param name="object_type" type="string" value="mixed"/>
+    <param name="folder_name" value="vertex_mix"/>
     <param name="show_single_vertex_plot" type="bool" value="true"/>
     <param name="show_all_vertices_plot" type="bool" value="true"/>
-    <param name="csv_ref_name" value="ref_data.csv"/>
+    <param name="csv_ref_name" value="ref_data_mix.csv"/>
+    <param name="circ_radius" type="double" value="0.025"/>  <!-- 0.065 0.025-->
+    <param name="vertices_num" type="int" value="6"/>  
 
   </node>
-  
+
 
 </launch>

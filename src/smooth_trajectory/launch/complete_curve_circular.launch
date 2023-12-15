@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="Trajectory" pkg="smooth_trajectory" type="complete_curve_trajectory_circular.py" respawn="false" output="screen">
+    <param name="folder_name" value="cont_circ"/>
+    <param name="show_single_vertex_plot" type="bool" value="true"/>
+    <param name="show_all_vertices_plot" type="bool" value="false"/>
+    <param name="csv_ref_name" value="ref_data_complete_circular.csv"/>
+    <param name="vertices_num" type="int" value="4"/>  
+
+  </node>
+  
+
+</launch>
