@@ -20,6 +20,7 @@ from mpl_toolkits import mplot3d
 from scipy.spatial.transform import Rotation as Rot
 from sklearn import datasets, linear_model
 import csv
+from scipy.optimize import minimize
 
 plt.style.use('default')
 
@@ -255,6 +256,12 @@ def write_vertices_to_csv(vertices):
             csv_writer_vert.writerow([vertex_x, vertex_y, vertex_z])
             csv_file_vert.flush()  # Ensure data is written immediately
 
+def quarter_circle(params, theta, x, y):
+    radius, center_x, center_y = params
+    x_model = radius * np.cos(theta) + center_x
+    y_model = radius * np.sin(theta) + center_y
+    residuals = np.concatenate((x_model - x, y_model - y))
+    return np.sum(residuals**2)
 
 if __name__ == '__main__':	
     try:
@@ -303,26 +310,28 @@ if __name__ == '__main__':
             # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
             # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
+            initial_params = [0.095,  0.38, -0.2823712]  # Provide a reasonable initial guess
+            x = data_from_optitrack_flatten[:, 0]
+            y =  data_from_optitrack_flatten[:, 2]
+            theta = np.linspace(0, -np.pi / 2, len(x))
 
-            X = data_from_optitrack_flatten[:, 0]
-            X = X.reshape(-1,1)
-            z = data_from_optitrack_flatten[:, 2]
-        
+            # Minimize the objective function
+            result = minimize(quarter_circle, initial_params, args=(theta, x, y))
 
-            ransac = linear_model.RANSACRegressor()
-            ransac.fit(X, z)
-            inlier_mask = ransac.inlier_mask_
-            outlier_mask = np.logical_not(inlier_mask)
+            radius, center_x, center_y = result.x
 
-            line_X = np.linspace(X[inlier_mask].min(), X[inlier_mask].max(),  10) #[:, np.newaxis]
-            line_X_new = line_X.reshape(-1,1)
-            line_z_ransac = ransac.predict(line_X_new)
+            # Plot the results
+            fitted_points_x = radius * np.cos(theta) + center_x
+            fitted_points_y = radius * np.sin(theta) + center_y
+            plt.scatter(x, y, color='blue', label='Synthetic Data with Noise')
+            plt.plot(fitted_points_x, fitted_points_y, color='red', label='Fitted Quarter Circle')
+            plt.xlabel('X')
+            plt.ylabel('Y')
+            plt.legend()
+            plt.show()
 
-            #local_waypoints = [line_X_new, data_from_optitrack_flatten[:,1], line_z_ransac]
-            all_waypoints[0, i*10:i*10+10] = line_X
-            all_waypoints[1, i*10:i*10+10] = data_from_optitrack_flatten[1,1]
-            all_waypoints[2, i*10:i*10+10] = line_z_ransac
-            
+            print(result.x)
+            exit()
 
             
 
@@ -452,4 +461,3 @@ if __name__ == '__main__':
 
     except rospy.ROSInterruptException:
         pass
-
