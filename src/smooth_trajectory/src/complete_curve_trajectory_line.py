@@ -169,16 +169,17 @@ def apply_transformation(homogeneous_matrix, vector):
 
 def only_vertices(all_waypoints, path):
     curr_pose = rtde_r.getActualTCPPose()
-
+     
     count = 0
     for i in range(0, len(np.transpose(all_waypoints))):
         curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-
-        if i == 0 or i == 10 or i == 20 or i == 30 or i == 40:
+               
+        
+        if i == 0 or i == 9 or i == 19 or i == 29 or i == 39:
             axis = [1,0, 0,1,0, 1]
             angles = [+np.pi/6,0, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
 
-            #curr_angles[axis[count]] += angles[count]
+            curr_angles[axis[count]] += angles[count]
             next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
             count += 1
              
@@ -190,7 +191,34 @@ def only_vertices(all_waypoints, path):
                 #compute_orientation(path[-1], curr_angles, path, [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i]])
                 print("Generating trajectory for vertex number ", i)
                 waypoint = [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
-                
+
+        print("adding", waypoint)     
+        path.append(waypoint)
+
+def linear_vertices_new(vertices, path):
+    curr_pose = rtde_r.getActualTCPPose()
+
+    for i in range(0, len(np.transpose(vertices))):
+        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
+
+        # axis = [1, 0,1,0, 1]
+        # angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
+        
+        # curr_angles[axis[i]] += angles[i]
+        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+
+        waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+
+             
+        # if i == 0:
+        #         print("Generating trajectory for vertex number ", i)
+        #         waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+        # else:
+        #         print("Pivoting orientation for vertex number ", i)
+        #         compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
+        #         print("Generating trajectory for vertex number ", i)
+        #         waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
+        
         path.append(waypoint)
 
 def publish_trajectory_to_RVIZ(pub, trajectory):
@@ -279,7 +307,7 @@ if __name__ == '__main__':
 
         # creating vertices container
         overall_data = np.array([])
-        all_waypoints = np.empty([3, VERTICES_NUM*10])
+        all_waypoints = np.empty([3, VERTICES_NUM*2])
         for i in range(0,VERTICES_NUM):
             print("Generating vertex number ", i)
             
@@ -319,12 +347,29 @@ if __name__ == '__main__':
             line_z_ransac = ransac.predict(line_X_new)
 
             #local_waypoints = [line_X_new, data_from_optitrack_flatten[:,1], line_z_ransac]
-            all_waypoints[0, i*10:i*10+10] = line_X
-            all_waypoints[1, i*10:i*10+10] = data_from_optitrack_flatten[1,1]
-            all_waypoints[2, i*10:i*10+10] = line_z_ransac
-            
+            # all_waypoints[0, i*10:i*10+10] = line_X
+            # all_waypoints[1, i*10:i*10+10] = data_from_optitrack_flatten[1,1]
+            # all_waypoints[2, i*10:i*10+10] = line_z_ransac
+            if i == 0:
+                all_waypoints[0, 0] = line_X[-1]
+                all_waypoints[0, 1] = line_X[0]
 
-            
+                all_waypoints[1, 0] = data_from_optitrack_flatten[1,1]
+                all_waypoints[1, 1] = data_from_optitrack_flatten[1,1]
+
+                all_waypoints[2, 0] = line_z_ransac[-1]
+                all_waypoints[2, 1] = line_z_ransac[0]
+
+            else:
+                all_waypoints[0, i*2] = line_X[0]
+                all_waypoints[0, i*2 +1] = line_X[-1]
+
+                all_waypoints[1, i] = data_from_optitrack_flatten[1,1]
+                all_waypoints[1, i+1] = data_from_optitrack_flatten[1,1]
+
+                all_waypoints[2, i*2] = line_z_ransac[0]
+                all_waypoints[2, i*2 +1] = line_z_ransac[-1]
+
 
             if single_vertex_plot:
                 lw = 2
@@ -345,7 +390,7 @@ if __name__ == '__main__':
         all_waypoints[1,:] = y_mean
 
         # offset in y for safety reasons
-        all_waypoints[1,:] += 0.02
+        #all_waypoints[1,:] += 0.02
         
         if all_vertices_plot:
             fig	 = plt.figure()
@@ -367,12 +412,13 @@ if __name__ == '__main__':
 
         print("ur_vertices", all_waypoints_ur_base)
         
+        all_waypoints_ur_base[2,:] += 0.05
         
         
         Ts = 0.002
         rtde_frequency = 500.0
-        rtde_c = RTDEControl("192.168.137.130")# rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)
-        rtde_r = rtde_receive.RTDEReceiveInterface("192.168.137.130")
+        rtde_c = RTDEControl("192.168.137.214")# rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)
+        rtde_r = rtde_receive.RTDEReceiveInterface("192.168.137.214")
 
         velocity = 0.5
         acceleration = 0.5
@@ -391,8 +437,10 @@ if __name__ == '__main__':
 
 
         #Generiting trajectory passing only vertices
-        only_vertices(all_waypoints_ur_base, path_only_vertex)
+        #only_vertices(all_waypoints_ur_base, path_only_vertex)
+        linear_vertices_new(all_waypoints_ur_base, path_only_vertex)
 
+        
         dirname = os.path.dirname(__file__)
         # Set the path to the folder where you want to save the CSV file
         folder_path = os.path.join(os.path.dirname(os.path.dirname(dirname)), 'smooth_trajectory/src/csv')

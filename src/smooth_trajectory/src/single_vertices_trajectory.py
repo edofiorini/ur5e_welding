@@ -440,9 +440,9 @@ if __name__ == '__main__':
 
             overall_data = np.append(overall_data, data_from_optitrack_flatten)
 
-            data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
-            data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
-            data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
+            # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
+            # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
+            # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
             
             vertex_median = np.median(data_from_optitrack_flatten, axis=0)
@@ -560,11 +560,11 @@ if __name__ == '__main__':
 
         plt.show()
 
-        exit()
+        
         write_ref_to_csv(plot_path_array)
         write_vertices_to_csv(vertices_ur_base)
         
-        exit()
+        
         publish_trajectory_to_RVIZ(pub_rviz, path_only_vertex)
     
         plot_traj = np.asarray(path_only_vertex)
@@ -590,7 +590,7 @@ if __name__ == '__main__':
         
         
         
-        rtde_r.startFileRecording("edoardo_data.csv")
+        #rtde_r.startFileRecording("edoardo_data.csv")
         rospy.Timer(rospy.Duration(0.002), logCallback)
         rtde_c.moveL(path_only_vertex)
         rtde_c.stopScript()
