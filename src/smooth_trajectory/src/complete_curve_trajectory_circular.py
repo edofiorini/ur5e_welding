@@ -286,7 +286,9 @@ if __name__ == '__main__':
 
         # creating vertices container
         overall_data = np.array([])
-        all_waypoints = np.empty([3, VERTICES_NUM*10])
+        #all_waypoints = np.empty([3, VERTICES_NUM*10])
+        all_waypoints = np.empty([3, VERTICES_NUM*2])
+
         for i in range(0,VERTICES_NUM):
             print("Generating vertex number ", i)
             
@@ -306,61 +308,79 @@ if __name__ == '__main__':
 
             overall_data = np.append(overall_data, data_from_optitrack_flatten)
 
+            if i == 0:
+                all_waypoints[0, 0] = data_from_optitrack_flatten[2, 0]
+                all_waypoints[0, 1] = data_from_optitrack_flatten[-1, 0]
+
+                all_waypoints[1, 0] = data_from_optitrack_flatten[1,1]
+                all_waypoints[1, 1] = data_from_optitrack_flatten[1,1]
+
+                all_waypoints[2, 0] = data_from_optitrack_flatten[2, 2]
+                all_waypoints[2, 1] = data_from_optitrack_flatten[-1, 2]
+
+            else:
+                all_waypoints[0, i*2] = data_from_optitrack_flatten[2, 0]
+                all_waypoints[0, i*2 +1] = data_from_optitrack_flatten[-1, 0]
+
+                all_waypoints[1, i] = data_from_optitrack_flatten[1,1]
+                all_waypoints[1, i+1] = data_from_optitrack_flatten[1,1]
+
+                all_waypoints[2, i*2] = data_from_optitrack_flatten[2, 2]
+                all_waypoints[2, i*2 +1] = data_from_optitrack_flatten[-1, 2]
+
             # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
             # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
             # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
 
-            initial_params = [0.095,  0.38, -0.2823712]  # Provide a reasonable initial guess
-            x = data_from_optitrack_flatten[:, 0]
-            y =  data_from_optitrack_flatten[:, 2]
-            theta = np.linspace(0, -np.pi / 2, len(x))
+            # initial_params = [0.095,  0.38, -0.2823712]  # Provide a reasonable initial guess
+            # x = data_from_optitrack_flatten[:, 0]
+            # y =  data_from_optitrack_flatten[:, 2]
+            # theta = np.linspace(0, -np.pi / 2, len(x))
 
-            # Minimize the objective function
-            result = minimize(quarter_circle, initial_params, args=(theta, x, y))
+            # # Minimize the objective function
+            # result = minimize(quarter_circle, initial_params, args=(theta, x, y))
 
-            radius, center_x, center_y = result.x
+            # radius, center_x, center_y = result.x
 
-            # Plot the results
-            fitted_points_x = radius * np.cos(theta) + center_x
-            fitted_points_y = radius * np.sin(theta) + center_y
-            plt.scatter(x, y, color='blue', label='Synthetic Data with Noise')
-            plt.plot(fitted_points_x, fitted_points_y, color='red', label='Fitted Quarter Circle')
-            plt.xlabel('X')
-            plt.ylabel('Y')
-            plt.legend()
-            plt.show()
+            # # Plot the results
+            # fitted_points_x = radius * np.cos(theta) + center_x
+            # fitted_points_y = radius * np.sin(theta) + center_y
+            # plt.scatter(x, y, color='blue', label='Synthetic Data with Noise')
+            # plt.plot(fitted_points_x, fitted_points_y, color='red', label='Fitted Quarter Circle')
+            # plt.xlabel('X')
+            # plt.ylabel('Y')
+            # plt.legend()
+            # plt.show()
 
-            print(result.x)
-            exit()
-
-            
+            # print(result.x)
+                
+       
 
             if single_vertex_plot:
                 lw = 2
-                plt.scatter(data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 2], c='r', marker='o', label=TRAJECTORY)
-                plt.scatter(X[inlier_mask], z[inlier_mask], color="yellowgreen", marker=".", label="Inliers")
-                plt.scatter(X[outlier_mask], z[outlier_mask], color="gold", marker=".", label="Outliers")
-                plt.plot(line_X_new, line_z_ransac, color="cornflowerblue", linewidth=lw, label="RANSAC regressor")
-                plt.legend(loc="lower right")
-                plt.xlabel("Input")
-                plt.ylabel("Response")
-                plt.show()
-
+                # plt.scatter(data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 2], c='r', marker='o', label=TRAJECTORY)
+                # plt.legend(loc="lower right")
+                # plt.xlabel("Input")
+                # plt.ylabel("Response")
+                # plt.show()
+        y_mean = np.mean(all_waypoints[1,:], axis=0)
+        all_waypoints[1,:] = y_mean
+        
         
         overall_data = np.reshape(overall_data,(int(len(overall_data)/3),3))
 
         # uniform y-axes for each vertex
-        y_mean = np.mean(all_waypoints[1,:], axis=0)
-        all_waypoints[1,:] = y_mean
+        # y_mean = np.mean(all_waypoints[1,:], axis=0)
+        # all_waypoints[1,:] = y_mean
 
-        # offset in y for safety reasons
-        all_waypoints[1,:] += 0.02
+ 
         
         if all_vertices_plot:
             fig	 = plt.figure()
             ax = fig.add_subplot(111, projection="3d")
             ax.scatter(all_waypoints[0, :], all_waypoints[1, :], all_waypoints[2, :], c='r', marker='o', label=TRAJECTORY)
             plt.show()
+
 
         print("Generated vertices w.r.t. optitrack frame:\n", all_waypoints)
         
@@ -374,6 +394,9 @@ if __name__ == '__main__':
         optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
         overall_data_ur_base = apply_transformation(optitrack_to_link0_hom_trans, np.transpose(overall_data))
 
+
+        # offset in y for safety reasons
+        all_waypoints_ur_base[2,:] += 0.02
         print("ur_vertices", all_waypoints_ur_base)
         
         
