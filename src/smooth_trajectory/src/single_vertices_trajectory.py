@@ -254,21 +254,21 @@ def circular_vertices(vertices, path):
 def mixed_vertices(vertices, path, motion_sequence):
     curr_pose = rtde_r.getActualTCPPose()
     #curr_pose = [0.115, -0.132, 0.216, 2.253, -2.295, 0.077]
-
+    k = 0
     for i in range(0, len(np.transpose(vertices))):
        
-        print("Generating trajectory for vertex number ", i)
+        print("Generating trakectory for vertex number ", i)
         curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
 
         axis = [1, 0, 1, 0, 1]
         angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
-        j = 0
-
+        
+        print("value", k)
              
         if i == 0:
-            curr_angles[axis[j]] += angles[j]
+            curr_angles[axis[k]] += angles[k]
             next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-            j += 1
+            k = k +1
             waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
             path.append(waypoint)
 
@@ -276,16 +276,16 @@ def mixed_vertices(vertices, path, motion_sequence):
                 
             if motion_sequence[i-1] == 0:
                 
-                curr_angles[axis[j-1]] += angles[j-1]
+                curr_angles[axis[k-1]] += angles[k-1]
                 next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
                 waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
                 path.append(waypoint)
 
             elif motion_sequence[i-1] == 2:
 
-                curr_angles[axis[j]] += angles[j]
+                curr_angles[axis[k]] += angles[k]
                 next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-                j += 1
+                k = k + 1
                 
                 compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
                 
@@ -294,9 +294,9 @@ def mixed_vertices(vertices, path, motion_sequence):
 
             else:
 
-                curr_angles[axis[j]] += angles[j]
+                curr_angles[axis[k]] += angles[k]
                 next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-                j += 1
+                k = k + 1
                 pi = np.array([[vertices[0, i-1]], [vertices[1, i-1]], [vertices[2, i-1]]])
                 pf = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
                 if i == 2:
@@ -549,7 +549,7 @@ if __name__ == '__main__':
             motion_sequence = [0, 1, 2, 0, 1, 0] # 0 is line, 1 is circle
             mixed_vertices(vertices_ur_base, path_only_vertex, motion_sequence)
         
-             
+        
         
         plot_path_array = np.asarray(path_only_vertex)
         

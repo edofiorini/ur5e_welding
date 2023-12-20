@@ -1,14 +1,14 @@
 clear all; close all; clc;
 
 d_plot = false; % true for 3d plot
-robot_data_csv_name = 'pose_data_rec_cont.csv';
-ref_data_csv_name = 'ref_data_complete_line.csv';
-vertices_csv_name = 'vertices_complete_line.csv';
+robot_data_csv_name = 'mix/pose_data_mix.csv';
+ref_data_csv_name = 'mix/ref_data_mix.csv';
+vertices_csv_name = 'mix/vertices_mix.csv';
 
 % only getting vertices
-robot_data_rec_csv_name = 'pose_data_rec.csv'; 
-ref_data_rec_csv_name = 'ref_data_rec.csv';
-vertices_rec_csv_name = 'vertices.csv';
+robot_data_rec_csv_name = 'mix/pose_data_mix.csv'; 
+ref_data_rec_csv_name = 'mix/ref_data_mix.csv';
+vertices_rec_csv_name = 'mix/vertices_mix.csv';
 
 % Specify the path to your CSV file
 robot_csvFilePath = strcat('/home/saras/Workspace/ur5e_welding/src/smooth_trajectory/src/csv/', robot_data_csv_name);
@@ -72,11 +72,11 @@ if d_plot
     title('Welding Trajectory');
 else
     figure;
-    plot(robot_rec_x, robot_rec_y, 'LineWidth', 0.1);
+    %plot(robot_rec_x, robot_rec_y, 'LineWidth', 0.1);
     hold on;
-    plot(ref_rec_x, ref_rec_y, 'LineWidth', 0.1);
+    %plot(ref_rec_x, ref_rec_y, 'LineWidth', 0.1);
     hold on;
-    scatter(vert_rec_x, vert_rec_y,'LineWidth', 1);
+    %scatter(vert_rec_x, vert_rec_y,'LineWidth', 1);
     hold on;
     plot(robot_x, robot_y, 'LineWidth', 0.1);
     hold on;

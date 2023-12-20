@@ -168,31 +168,57 @@ def apply_transformation(homogeneous_matrix, vector):
     new_vector = np.matmul(homogeneous_matrix, vector)
     return new_vector[0:3,:]
 
-def only_vertices(all_waypoints, path):
+def circular_vertices(vertices, path):
     curr_pose = rtde_r.getActualTCPPose()
-
-    count = 0
-    for i in range(0, len(np.transpose(all_waypoints))):
+    #curr_pose = [0.115, -0.132, 0.216, 2.253, -2.295, 0.077]
+    k = 0
+    for i in range(0, len(np.transpose(vertices)) - 3):
+       
+        print("Generating trajectory for vertex number ", i)
         curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
 
-        if i == 0 or i == 10 or i == 20 or i == 30 or i == 40:
-            axis = [1,0, 0,1,0, 1]
-            angles = [+np.pi/6,0, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
-
-            #curr_angles[axis[count]] += angles[count]
-            next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-            count += 1
+        axis = [1, 0,1,0, 1, 1]
+        angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6, +np.pi/6]
+        
+        curr_angles[axis[i]] += angles[i]
+        next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
              
-        if i < 10:
-                print("Generating trajectory for vertex number ", i)
-                waypoint = [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
-        else:
-                print("Pivoting orientation for vertex number ", i)
-                #compute_orientation(path[-1], curr_angles, path, [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i]])
-                print("Generating trajectory for vertex number ", i)
-                waypoint = [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
+        if i == 0:
                 
-        path.append(waypoint)
+            waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+            path.append(waypoint)
+
+        else:
+                
+
+            pi = np.array([[vertices[0, k]], [vertices[1, k]], [vertices[2, k]]])
+            pf = np.array([[vertices[0, k+1]], [vertices[1, k+1]], [vertices[2, k+1]]])
+            c = np.array([[vertices[0, 0]], [vertices[1, 0] + radius], [vertices[2, 0]]]) #robot + radius y
+            k = k + 2
+            circ_path = circular_path(pi, pf, c,  Ts)
+            print("Pi:", pi)
+            print("Pf:", pf)
+            print("Path:", circ_path)
+            
+            r_start = Rot.from_rotvec([path[-1][3], path[-1][4], path[-1][5]])
+            r_end = Rot.from_euler('xyz', curr_angles)
+            times = np.linspace(0, 1, len(np.transpose(circ_path)))
+            key_rots = Rot.concatenate([r_start, r_end])
+            key_times = [0, 1]
+            slerp = Slerp(key_times, key_rots)
+            interp_rots = slerp(times)
+            o = interp_rots.as_rotvec()
+
+
+            # from tuple to array
+            circ_path = np.array(circ_path)
+            
+            for j in range(0, len(o)):
+                if i == 0:
+                    waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                else:
+                    waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                path.append(waypoint)
 
 def publish_trajectory_to_RVIZ(pub, trajectory):
     ps = PoseArray()
@@ -263,6 +289,7 @@ def quarter_circle(params, theta, x, y):
     residuals = np.concatenate((x_model - x, y_model - y))
     return np.sum(residuals**2)
 
+radius = 0.095
 if __name__ == '__main__':	
     try:
         rospy.init_node('Trajectory', anonymous=True)
@@ -403,8 +430,8 @@ if __name__ == '__main__':
         
         Ts = 0.002
         rtde_frequency = 500.0
-        rtde_c = RTDEControl("192.168.137.130")# rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)
-        rtde_r = rtde_receive.RTDEReceiveInterface("192.168.137.130")
+        rtde_c = RTDEControl("192.168.137.214")# rtde_frequency, RTDEControl.FLAG_USE_EXT_UR_CAP)
+        rtde_r = rtde_receive.RTDEReceiveInterface("192.168.137.214")
 
         velocity = 0.5
         acceleration = 0.5
@@ -423,13 +450,14 @@ if __name__ == '__main__':
 
 
         #Generiting trajectory passing only vertices
-        only_vertices(all_waypoints_ur_base, path_only_vertex)
-
+        #only_vertices(all_waypoints_ur_base, path_only_vertex)
+        circular_vertices(all_waypoints_ur_base, path_only_vertex)
+        
         dirname = os.path.dirname(__file__)
         # Set the path to the folder where you want to save the CSV file
         folder_path = os.path.join(os.path.dirname(os.path.dirname(dirname)), 'smooth_trajectory/src/csv')
         file_path = os.path.join(folder_path, csv_ref_name)
-        file_path_vertices = os.path.join(folder_path, 'vertices_complete_line.csv')
+        file_path_vertices = os.path.join(folder_path, 'vertices_complete_circular.csv')
         
         # Create or open the CSV file for writing
         csv_file = open(file_path, 'w')
@@ -448,7 +476,7 @@ if __name__ == '__main__':
         ax = fig.add_subplot(111, projection="3d")
         ax.scatter(plot_path_array[:, 0], plot_path_array[:, 1], c='red', marker='o', label='Acquired vertices', s=0.3)
         plt.show()
-
+        
         write_ref_to_csv(plot_path_array)
         write_vertices_to_csv(all_waypoints_ur_base)
         

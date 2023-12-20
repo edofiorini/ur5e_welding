@@ -2,7 +2,7 @@
 <launch>
 
   <node name="Trajectory" pkg="smooth_trajectory" type="complete_curve_trajectory_line.py" respawn="false" output="screen">
-    <param name="folder_name" value="cont_rec"/>
+    <param name="folder_name" value="vertex_rec_cont"/>
     <param name="show_single_vertex_plot" type="bool" value="true"/>
     <param name="show_all_vertices_plot" type="bool" value="true"/>
     <param name="csv_ref_name" value="ref_data_complete_line.csv"/>
