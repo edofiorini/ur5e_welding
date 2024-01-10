@@ -411,6 +411,7 @@ if __name__ == '__main__':
         single_vertex_plot = rospy.get_param('Trajectory/show_single_vertex_plot')
         all_vertices_plot = rospy.get_param('Trajectory/show_all_vertices_plot')
         csv_ref_name = rospy.get_param('Trajectory/csv_ref_name')
+        csv_vertices_name = rospy.get_param('Trajectory/vertices_name')
         radius = rospy.get_param('Trajectory/circ_radius')
         VERTICES_NUM = rospy.get_param('Trajectory/vertices_num')
         DATA_BASE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'vertices_data')
@@ -496,7 +497,7 @@ if __name__ == '__main__':
 
         #print("overall", overall_data)
         overall_data_ur_base = apply_transformation(optitrack_to_link0_hom_trans, np.transpose(overall_data))
-
+        
         print("Ur_vertices:\n", vertices_ur_base)
         
         print("Connecting to the robot ...")
@@ -526,7 +527,7 @@ if __name__ == '__main__':
         # Set the path to the folder where you want to save the CSV file
         folder_path = os.path.join(os.path.dirname(os.path.dirname(dirname)), 'smooth_trajectory/src/csv')
         file_path = os.path.join(folder_path, csv_ref_name)
-        file_path_vertices = os.path.join(folder_path, 'vertices.csv')
+        file_path_vertices = os.path.join(folder_path, csv_vertices_name)
         
         # Create or open the CSV file for writing
         csv_file = open(file_path, 'w')

@@ -5,7 +5,7 @@
     <param name="folder_name" value="vertex_rec_cont"/>
     <param name="show_single_vertex_plot" type="bool" value="true"/>
     <param name="show_all_vertices_plot" type="bool" value="true"/>
-    <param name="csv_ref_name" value="ref_data_complete_line.csv"/>
+    <param name="csv_ref_name" value="ref_complete_line.csv"/>
     <param name="vertices_num" type="int" value="4"/>  
 
   </node>

@@ -400,7 +400,7 @@ if __name__ == '__main__':
 
         print("Generated vertices w.r.t. optitrack frame:\n", all_waypoints)
         
-        
+        exit()
         # Transforming the trajectory for welding the object in frame ur_base
         (trans, rot) = transformer.lookupTransform("/ur/base", "/optitrack_world", rospy.Time(0))
         optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
@@ -445,7 +445,7 @@ if __name__ == '__main__':
         # Set the path to the folder where you want to save the CSV file
         folder_path = os.path.join(os.path.dirname(os.path.dirname(dirname)), 'smooth_trajectory/src/csv')
         file_path = os.path.join(folder_path, csv_ref_name)
-        file_path_vertices = os.path.join(folder_path, 'vertices_complete_line.csv')
+        file_path_vertices = os.path.join(folder_path, 'vertices_complete.csv')
         
         # Create or open the CSV file for writing
         csv_file = open(file_path, 'w')
