@@ -2,14 +2,14 @@
 clear all; close all; clc;
 
 % import data
-robot_pointer_csv_name = 'mix/pose_data_mix.csv';
-ref_pointer_csv_name = 'mix/ref_data_mix.csv';
-vertices_pointer_csv_name = 'mix/vertices_mix.csv';
+robot_pointer_csv_name = 'robot_pointer.csv';
+ref_pointer_csv_name = 'ref_pointer.csv';
+vertices_pointer_csv_name = 'vertices_pointer.csv';
 
 
-robot_complete_csv_name = 'rec/pose_data_rec_cont.csv'; 
-ref_complete_csv_name = 'rec/ref_data_complete_line.csv';
-vertices_complete_csv_name = 'rec/vertices_complete_line.csv';
+robot_complete_csv_name = 'robot_complete.csv'; 
+ref_complete_csv_name = 'ref_complete_mix.csv';
+vertices_complete_csv_name = 'vertices_complete_mix.csv';
 
 % Specify the path to your CSV file
 robot_pointer_csvFilePath = strcat('/home/saras/Workspace/ur5e_welding/src/smooth_trajectory/src/csv/', robot_pointer_csv_name);
@@ -71,11 +71,11 @@ screensize = get( 0, 'Screensize');
 figure('units','normalized','outerposition',[0 0 screensize(end)/screensize(end-1) 1]);
 
 % pointer method
-plot(robot_pointer_x, robot_pointer_y, '.', 'Color', robot_pointer, 'Linewidth', LineWidth_size);
-hold on;
-plot(ref_pointer_x, ref_pointer_y, '.', 'Color', ref_pointer, 'Linewidth', LineWidth_size);
-hold on;
-scatter(vert_pointer_x, vert_pointer_y,'.', 'Color', vert_pointer, 'Linewidth', LineWidth_size);
+%plot(robot_pointer_x, robot_pointer_y, '.', 'Color', robot_pointer, 'Linewidth', LineWidth_size);
+%hold on;
+%plot(ref_pointer_x, ref_pointer_y, '.', 'Color', ref_pointer, 'Linewidth', LineWidth_size);
+%hold on;
+%scatter(vert_pointer_x, vert_pointer_y,'.', 'Color', vert_pointer, 'Linewidth', LineWidth_size);
 
 % complete line method
 plot(robot_complete_x, robot_complete_y, '.', 'Color', robot_complete, 'Linewidth', LineWidth_size);

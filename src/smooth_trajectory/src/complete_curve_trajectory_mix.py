@@ -20,6 +20,7 @@ from mpl_toolkits import mplot3d
 from scipy.spatial.transform import Rotation as Rot
 from sklearn import datasets, linear_model
 import csv
+from scipy.optimize import minimize
 
 plt.style.use('default')
 
@@ -167,59 +168,57 @@ def apply_transformation(homogeneous_matrix, vector):
     new_vector = np.matmul(homogeneous_matrix, vector)
     return new_vector[0:3,:]
 
-def only_vertices(all_waypoints, path):
+def circular_vertices(vertices, path):
     curr_pose = rtde_r.getActualTCPPose()
-     
-    count = 0
-    for i in range(0, len(np.transpose(all_waypoints))):
-        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
-               
-        
-        if i == 0 or i == 9 or i == 19 or i == 29 or i == 39:
-            axis = [1,0, 0,1,0, 1]
-            angles = [+np.pi/6,0, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
-
-            curr_angles[axis[count]] += angles[count]
-            next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-            count += 1
-             
-        if i < 10:
-                print("Generating trajectory for vertex number ", i)
-                waypoint = [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
-        else:
-                print("Pivoting orientation for vertex number ", i)
-                #compute_orientation(path[-1], curr_angles, path, [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i]])
-                print("Generating trajectory for vertex number ", i)
-                waypoint = [all_waypoints[0, i], all_waypoints[1, i], all_waypoints[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
-
-        print("adding", waypoint)     
-        path.append(waypoint)
-
-def linear_vertices_new(vertices, path):
-    curr_pose = rtde_r.getActualTCPPose()
-
-    for i in range(0, len(np.transpose(vertices))):
+    #curr_pose = [0.115, -0.132, 0.216, 2.253, -2.295, 0.077]
+    k = 0
+    for i in range(0, len(np.transpose(vertices)) - 3):
+       
+        print("Generating trajectory for vertex number ", i)
         curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
 
-        # axis = [1, 0,1,0, 1]
-        # angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
+        axis = [1, 0,1,0, 1, 1]
+        angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6, +np.pi/6]
         
-        # curr_angles[axis[i]] += angles[i]
+        curr_angles[axis[i]] += angles[i]
         next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
-
-        waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
-
              
-        # if i == 0:
-        #         print("Generating trajectory for vertex number ", i)
-        #         waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
-        # else:
-        #         print("Pivoting orientation for vertex number ", i)
-        #         compute_orientation(path[-1], curr_angles, path, [vertices[0, i], vertices[1, i], vertices[2, i]])
-        #         print("Generating trajectory for vertex number ", i)
-        #         waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
-        
-        path.append(waypoint)
+        if i == 0:
+                
+            waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+            path.append(waypoint)
+
+        else:
+                
+
+            pi = np.array([[vertices[0, k]], [vertices[1, k]], [vertices[2, k]]])
+            pf = np.array([[vertices[0, k+1]], [vertices[1, k+1]], [vertices[2, k+1]]])
+            c = np.array([[vertices[0, 0]], [vertices[1, 0] + radius], [vertices[2, 0]]]) #robot + radius y
+            k = k + 2
+            circ_path = circular_path(pi, pf, c,  Ts)
+            print("Pi:", pi)
+            print("Pf:", pf)
+            print("Path:", circ_path)
+            
+            r_start = Rot.from_rotvec([path[-1][3], path[-1][4], path[-1][5]])
+            r_end = Rot.from_euler('xyz', curr_angles)
+            times = np.linspace(0, 1, len(np.transpose(circ_path)))
+            key_rots = Rot.concatenate([r_start, r_end])
+            key_times = [0, 1]
+            slerp = Slerp(key_times, key_rots)
+            interp_rots = slerp(times)
+            o = interp_rots.as_rotvec()
+
+
+            # from tuple to array
+            circ_path = np.array(circ_path)
+            
+            for j in range(0, len(o)):
+                if i == 0:
+                    waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                else:
+                    waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                path.append(waypoint)
 
 def publish_trajectory_to_RVIZ(pub, trajectory):
     ps = PoseArray()
@@ -283,7 +282,158 @@ def write_vertices_to_csv(vertices):
             csv_writer_vert.writerow([vertex_x, vertex_y, vertex_z])
             csv_file_vert.flush()  # Ensure data is written immediately
 
+def quarter_circle(params, theta, x, y):
+    radius, center_x, center_y = params
+    x_model = radius * np.cos(theta) + center_x
+    y_model = radius * np.sin(theta) + center_y
+    residuals = np.concatenate((x_model - x, y_model - y))
+    return np.sum(residuals**2)
 
+def extract_line(data_from_optitrack_flatten, i):
+    print("################", data_from_optitrack_flatten[1,1])
+    X = data_from_optitrack_flatten[:, 0]
+    X = X.reshape(-1,1)
+    z = data_from_optitrack_flatten[:, 2]
+
+    ransac = linear_model.RANSACRegressor()
+    ransac.fit(X, z)
+    inlier_mask = ransac.inlier_mask_
+    outlier_mask = np.logical_not(inlier_mask)
+    line_X = np.linspace(X[inlier_mask].min(), X[inlier_mask].max(),  10) #[:, np.newaxis]
+    line_X_new = line_X.reshape(-1,1)
+    line_z_ransac = ransac.predict(line_X_new)
+
+    #local_waypoints = [line_X_new, data_from_optitrack_flatten[:,1], line_z_ransac]
+    # all_waypoints[0, i*10:i*10+10] = line_X
+    # all_waypoints[1, i*10:i*10+10] = data_from_optitrack_flatten[1,1]
+    # all_waypoints[2, i*10:i*10+10] = line_z_ransac
+    if i == 0:
+        all_waypoints[0, 0] = line_X[-1]
+        all_waypoints[0, 1] = line_X[0]
+        all_waypoints[1, 0] = data_from_optitrack_flatten[1,1]
+        all_waypoints[1, 1] = data_from_optitrack_flatten[1,1]
+        all_waypoints[2, 0] = line_z_ransac[-1]
+        all_waypoints[2, 1] = line_z_ransac[0]
+    else:
+        all_waypoints[0, i*2] = line_X[0]
+        all_waypoints[0, i*2 +1] = line_X[-1]
+        all_waypoints[1, i*2] = data_from_optitrack_flatten[1,1]
+        all_waypoints[1, i*2+1] = data_from_optitrack_flatten[1,1]
+        all_waypoints[2, i*2] = line_z_ransac[0]
+        all_waypoints[2, i*2 +1] = line_z_ransac[-1]
+
+def extract_circle(data_from_optitrack_flatten, i):
+    if i == 0:
+        all_waypoints[0, 0] = data_from_optitrack_flatten[2, 0]
+        all_waypoints[0, 1] = data_from_optitrack_flatten[-1, 0]
+        all_waypoints[1, 0] = data_from_optitrack_flatten[1,1]
+        all_waypoints[1, 1] = data_from_optitrack_flatten[1,1]
+        all_waypoints[2, 0] = data_from_optitrack_flatten[2, 2]
+        all_waypoints[2, 1] = data_from_optitrack_flatten[-1, 2]
+
+    else:
+        all_waypoints[0, i*2] = data_from_optitrack_flatten[2, 0]
+        all_waypoints[0, i*2 +1] = data_from_optitrack_flatten[-1, 0]
+        all_waypoints[1, i*2] = data_from_optitrack_flatten[1,1]
+        all_waypoints[1, i*2+1] = data_from_optitrack_flatten[1,1]
+        all_waypoints[2, i*2] = data_from_optitrack_flatten[2, 2]
+        all_waypoints[2, i*2 +1] = data_from_optitrack_flatten[-1, 2]
+
+def mixed_vertices(vertices, path, motion_sequence):
+    curr_pose = rtde_r.getActualTCPPose()
+    #curr_pose = [0.115, -0.132, 0.216, 2.253, -2.295, 0.077]
+    k = 0
+    print("##", len(np.transpose(vertices)))
+    for i in range(0, len(np.transpose(vertices))-5):
+        
+        print("Generating trakectory for vertex number ", i)
+        curr_angles = Rot.from_rotvec([curr_pose[3], curr_pose[4], curr_pose[5]]).as_euler('xyz')
+
+        axis = [1, 0, 1, 0, 1]
+        angles = [+np.pi/6, -np.pi/6, -np.pi/6, +np.pi/6, +np.pi/6]
+        
+        print("value", k)
+             
+        if i == 0:
+            curr_angles[axis[k]] += angles[k]
+            next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+            k = k +1
+            waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]       
+            path.append(waypoint)
+
+        else:
+                
+            if motion_sequence[i-1] == 0:
+                if i == 4:
+                    curr_angles[axis[k-1]] += angles[k-1]
+                    next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+                    waypoint = [vertices[0, i+3], vertices[1, i+3], vertices[2, i+3], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]  
+                elif i == 6:
+                    curr_angles[axis[k-1]] += angles[k-1]
+                    next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+                    waypoint = [vertices[0, 0], vertices[1, 0], vertices[2, 0], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0] 
+                else:
+                    curr_angles[axis[k-1]] += angles[k-1]
+                    next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+                    waypoint = [vertices[0, i], vertices[1, i], vertices[2, i], next_angles_rotvec[0], next_angles_rotvec[1], next_angles_rotvec[2], velocity, acceleration, 0.0]     
+                path.append(waypoint)
+                
+
+
+            elif motion_sequence[i-1] == 2:
+
+                curr_angles[axis[k]] += angles[k]
+                next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+                k = k + 1
+                
+                compute_orientation(path[-1], curr_angles, path, [vertices[0, i+2], vertices[1, i+2], vertices[2, i+2]])
+                
+                waypoint = [vertices[0, i+2], vertices[1, i+2], vertices[2, i+2], path[-1][3], path[-1][4], path[-1][5], velocity, acceleration, 0.0]
+                path.append(waypoint)
+
+            else:
+                if i == 5:
+                    curr_angles[axis[k]] += angles[k]
+                    next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+                    k = k + 1
+                    pi = np.array([[vertices[0, i+3]], [vertices[1, i+3]], [vertices[2, i+3]]])
+                    pf = np.array([[vertices[0, i+4]], [vertices[1, i+4]], [vertices[2, i+4]]])
+                    c = np.array([[vertices[0, i+2]], [vertices[1, i+2]  - radius], [vertices[2, i+2]]]) 
+                        
+                else:
+                    curr_angles[axis[k]] += angles[k]
+                    next_angles_rotvec = Rot.from_euler('xyz', curr_angles).as_rotvec()
+                    k = k + 1
+                    pi = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
+                    pf = np.array([[vertices[0, i+1]], [vertices[1, i+1]], [vertices[2, i+1]]])
+                    c = np.array([[vertices[0, i]], [vertices[1, i]  + radius], [vertices[2, i]]])
+                circ_path = circular_path(pi, pf, c,  Ts)
+                print("Pi:", pi)
+                print("Pf:", pf)
+                print("Path:", circ_path)
+
+                r_start = Rot.from_rotvec([path[-1][3], path[-1][4], path[-1][5]])
+                r_end = Rot.from_euler('xyz', curr_angles)
+                times = np.linspace(0, 1, len(np.transpose(circ_path)))
+                key_rots = Rot.concatenate([r_start, r_end])
+                key_times = [0, 1]
+                slerp = Slerp(key_times, key_rots)
+                interp_rots = slerp(times)
+                o = interp_rots.as_rotvec()
+
+
+                # from tuple to array
+                circ_path = np.array(circ_path)
+
+                for j in range(0, len(o)):
+                    if i == 0:
+                        waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                    else:
+                        waypoint = [circ_path[0][0, j], circ_path[0][1, j], circ_path[0][2, j], o[j, 0], o[j, 1], o[j, 2], velocity, acceleration, 0.0]
+                    path.append(waypoint)
+        print("## Waypoint ##", waypoint)
+
+radius = 0.025
 if __name__ == '__main__':	
     try:
         rospy.init_node('Trajectory', anonymous=True)
@@ -307,7 +457,9 @@ if __name__ == '__main__':
 
         # creating vertices container
         overall_data = np.array([])
+        #all_waypoints = np.empty([3, VERTICES_NUM*10])
         all_waypoints = np.empty([3, VERTICES_NUM*2])
+        primitive_type = [0, 1, 0, 0, 1, 0 ]
         for i in range(0,VERTICES_NUM):
             print("Generating vertex number ", i)
             
@@ -316,7 +468,7 @@ if __name__ == '__main__':
             TRAJECTORY = data_name + "_" + str(i)
             rosbag_to_csv(DATA_BASE_PATH, FOLDER)
 
-            print("###", DATA_BASE_PATH, TRAJECTORY)
+
             df = create_data_frame(DATA_BASE_PATH, TRAJECTORY)
 
             data_from_optitrack = df.loc[:,["pose.position.x", "pose.position.y", "pose.position.z"]]  
@@ -327,76 +479,42 @@ if __name__ == '__main__':
 
             overall_data = np.append(overall_data, data_from_optitrack_flatten)
 
-            # data_from_optitrack_flatten[:, 0] = data_from_optitrack_flatten[:, 0]*1000
-            # data_from_optitrack_flatten[:, 1] = data_from_optitrack_flatten[:, 1]*1000
-            # data_from_optitrack_flatten[:, 2] = data_from_optitrack_flatten[:, 2]*1000 
-
-
-            X = data_from_optitrack_flatten[:, 0]
-            X = X.reshape(-1,1)
-            z = data_from_optitrack_flatten[:, 2]
-        
-
-            ransac = linear_model.RANSACRegressor()
-            ransac.fit(X, z)
-            inlier_mask = ransac.inlier_mask_
-            outlier_mask = np.logical_not(inlier_mask)
-
-            line_X = np.linspace(X[inlier_mask].min(), X[inlier_mask].max(),  10) #[:, np.newaxis]
-            line_X_new = line_X.reshape(-1,1)
-            line_z_ransac = ransac.predict(line_X_new)
-
-            #local_waypoints = [line_X_new, data_from_optitrack_flatten[:,1], line_z_ransac]
-            # all_waypoints[0, i*10:i*10+10] = line_X
-            # all_waypoints[1, i*10:i*10+10] = data_from_optitrack_flatten[1,1]
-            # all_waypoints[2, i*10:i*10+10] = line_z_ransac
-            if i == 0:
-                all_waypoints[0, 0] = line_X[-1]
-                all_waypoints[0, 1] = line_X[0]
-
-                all_waypoints[1, 0] = data_from_optitrack_flatten[1,1]
-                all_waypoints[1, 1] = data_from_optitrack_flatten[1,1]
-
-                all_waypoints[2, 0] = line_z_ransac[-1]
-                all_waypoints[2, 1] = line_z_ransac[0]
-
+            if primitive_type[i] == 0:
+                extract_line(data_from_optitrack_flatten, i)
+                print("ALL", all_waypoints)
             else:
-                all_waypoints[0, i*2] = line_X[0]
-                all_waypoints[0, i*2 +1] = line_X[-1]
-
-                all_waypoints[1, i] = data_from_optitrack_flatten[1,1]
-                all_waypoints[1, i+1] = data_from_optitrack_flatten[1,1]
-
-                all_waypoints[2, i*2] = line_z_ransac[0]
-                all_waypoints[2, i*2 +1] = line_z_ransac[-1]
-
+                extract_circle(data_from_optitrack_flatten, i)
+                 
+                
+       
 
             if single_vertex_plot:
                 lw = 2
-                plt.scatter(data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 2], c='r', marker='o', label=TRAJECTORY)
-                plt.scatter(X[inlier_mask], z[inlier_mask], color="yellowgreen", marker=".", label="Inliers")
-                plt.scatter(X[outlier_mask], z[outlier_mask], color="gold", marker=".", label="Outliers")
-                plt.plot(line_X_new, line_z_ransac, color="cornflowerblue", linewidth=lw, label="RANSAC regressor")
-                plt.legend(loc="lower right")
-                plt.xlabel("Input")
-                plt.ylabel("Response")
-                plt.show()
+                # plt.scatter(data_from_optitrack_flatten[:, 0], data_from_optitrack_flatten[:, 2], c='r', marker='o', label=TRAJECTORY)
+                # plt.legend(loc="lower right")
+                # plt.xlabel("Input")
+                # plt.ylabel("Response")
+                # plt.show()
 
+        
+        y_mean = np.mean(all_waypoints[1,:], axis=0)
+        all_waypoints[1,:] = y_mean
+        
         
         overall_data = np.reshape(overall_data,(int(len(overall_data)/3),3))
 
         # uniform y-axes for each vertex
-        y_mean = np.mean(all_waypoints[1,:], axis=0)
-        all_waypoints[1,:] = y_mean
+        # y_mean = np.mean(all_waypoints[1,:], axis=0)
+        # all_waypoints[1,:] = y_mean
 
-        # offset in y for safety reasons
-        #all_waypoints[1,:] += 0.02
+ 
         
         if all_vertices_plot:
             fig	 = plt.figure()
-            ax = fig.add_subplot(111, projection="3d")
-            ax.scatter(all_waypoints[0, :], all_waypoints[1, :], all_waypoints[2, :], c='r', marker='o', label=TRAJECTORY)
+            ax = fig.add_subplot(111)
+            ax.scatter(all_waypoints[0, :], all_waypoints[2, :], c='r', marker='o', label=TRAJECTORY)
             plt.show()
+
 
         print("Generated vertices w.r.t. optitrack frame:\n", all_waypoints)
         
@@ -410,9 +528,11 @@ if __name__ == '__main__':
         optitrack_to_link0_hom_trans = get_homogeneous_matrix(rot, trans)
         overall_data_ur_base = apply_transformation(optitrack_to_link0_hom_trans, np.transpose(overall_data))
 
+
+        # offset in y for safety reasons
+        all_waypoints_ur_base[2,:] += 0.02
         print("ur_vertices", all_waypoints_ur_base)
         
-        all_waypoints_ur_base[2,:] += 0.05
         
         
         Ts = 0.002
@@ -435,17 +555,18 @@ if __name__ == '__main__':
 
         path_only_vertex = []
 
+        motion_sequence = [0, 1, 2, 0, 1, 0] # 0 is line, 1 is circle
+        mixed_vertices(all_waypoints_ur_base, path_only_vertex, motion_sequence)
 
         #Generiting trajectory passing only vertices
         #only_vertices(all_waypoints_ur_base, path_only_vertex)
-        linear_vertices_new(all_waypoints_ur_base, path_only_vertex)
-
+        #circular_vertices(all_waypoints_ur_base, path_only_vertex)
         
         dirname = os.path.dirname(__file__)
         # Set the path to the folder where you want to save the CSV file
         folder_path = os.path.join(os.path.dirname(os.path.dirname(dirname)), 'smooth_trajectory/src/csv')
         file_path = os.path.join(folder_path, csv_ref_name)
-        file_path_vertices = os.path.join(folder_path, 'vertices_complete.csv')
+        file_path_vertices = os.path.join(folder_path, 'vertices_complete_mix.csv')
         
         # Create or open the CSV file for writing
         csv_file = open(file_path, 'w')
@@ -464,7 +585,7 @@ if __name__ == '__main__':
         ax = fig.add_subplot(111, projection="3d")
         ax.scatter(plot_path_array[:, 0], plot_path_array[:, 1], c='red', marker='o', label='Acquired vertices', s=0.3)
         plt.show()
-
+        
         write_ref_to_csv(plot_path_array)
         write_vertices_to_csv(all_waypoints_ur_base)
         
@@ -480,7 +601,7 @@ if __name__ == '__main__':
         #ax.scatter(data_from_robot[:, 0]*1000, data_from_robot[:, 1]*1000, c='blue', marker='o', label='Robot pose', s=1)
 
 
-        #ax.scatter(plot_traj[:, 0], plot_traj[:,1], plot_traj[:, 2], c='b', marker='o', label='Acquired optitrack trajectory')
+        ax.scatter(plot_traj[:, 0]*1000, plot_traj[:,1]*1000, c='b', marker='o', label='Acquired optitrack trajectory')
         plt.legend()   
         #ax.xaxis.set_minor_locator(AutoMinorLocator())
         #ax.yaxis.set_minor_locator(AutoMinorLocator())
@@ -494,10 +615,9 @@ if __name__ == '__main__':
         
         
         #rtde_r.startFileRecording("data.csv")
-        rospy.Timer(rospy.Duration(0.002), logCallback)
+        rospy.Timer(rospy.Duration(0.0002), logCallback)
         rtde_c.moveL(path_only_vertex)
         rtde_c.stopScript()
 
     except rospy.ROSInterruptException:
         pass
-

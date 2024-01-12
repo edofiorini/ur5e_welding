@@ -25,7 +25,7 @@ class PoseSubscriberNode:
         self.csv_writer.writerow(['timestamp', 'x', 'y', 'z'])
 
         # Subscribe to the PoseStamped topic
-        rospy.Subscriber('/robot_position', PoseStamped, self.pose_callback)
+        rospy.Subscriber('/robot_position', PoseStamped, self.pose_callback, queue_size=1)
 
     def pose_callback(self, msg):
         rospy.loginfo("Writing csv!")
