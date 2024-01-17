@@ -2,7 +2,7 @@
 <launch>
 
   <node name="robot_pose_subscriber_node" pkg="smooth_trajectory" type="record_robot_pose.py" respawn="false" output="screen">
-    <param name="csv_name" type="string" value="robot_complete.csv"/>
+    <param name="csv_name" type="string" value="robot_pointer.csv"/>
   </node>
   
   

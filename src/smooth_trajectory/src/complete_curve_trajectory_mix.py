@@ -398,7 +398,7 @@ def mixed_vertices(vertices, path, motion_sequence):
                     k = k + 1
                     pi = np.array([[vertices[0, i+3]], [vertices[1, i+3]], [vertices[2, i+3]]])
                     pf = np.array([[vertices[0, i+4]], [vertices[1, i+4]], [vertices[2, i+4]]])
-                    c = np.array([[vertices[0, i+2]], [vertices[1, i+2]  - radius], [vertices[2, i+2]]]) 
+                    c = np.array([[vertices[0, i+2]], [vertices[1, i+2]  - 0.02], [vertices[2, i+2]]]) 
                         
                 else:
                     curr_angles[axis[k]] += angles[k]
@@ -406,7 +406,7 @@ def mixed_vertices(vertices, path, motion_sequence):
                     k = k + 1
                     pi = np.array([[vertices[0, i]], [vertices[1, i]], [vertices[2, i]]])
                     pf = np.array([[vertices[0, i+1]], [vertices[1, i+1]], [vertices[2, i+1]]])
-                    c = np.array([[vertices[0, i]], [vertices[1, i]  + radius], [vertices[2, i]]])
+                    c = np.array([[vertices[0, i]], [vertices[1, i]  + 0.035], [vertices[2, i]]])
                 circ_path = circular_path(pi, pf, c,  Ts)
                 print("Pi:", pi)
                 print("Pf:", pf)

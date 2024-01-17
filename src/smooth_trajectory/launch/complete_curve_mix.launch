@@ -2,7 +2,7 @@
 <launch>
 
   <node name="Trajectory" pkg="smooth_trajectory" type="complete_curve_trajectory_mix.py" respawn="false" output="screen">
-    <param name="folder_name" value="vertex_mix_cont"/>
+    <param name="folder_name" value="vertex_mix_cont_new"/>
     <param name="show_single_vertex_plot" type="bool" value="false"/>
     <param name="show_all_vertices_plot" type="bool" value="true"/>
     <param name="csv_ref_name" value="ref_complete_mix.csv"/>

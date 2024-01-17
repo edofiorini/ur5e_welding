@@ -302,7 +302,7 @@ def mixed_vertices(vertices, path, motion_sequence):
                 if i == 2:
                     c = np.array([[vertices[0, i-1]], [vertices[1, i-1]  + radius], [vertices[2, i-1]]])
                 else:
-                    c = np.array([[vertices[0, i-1]], [vertices[1, i-1]  - radius], [vertices[2, i-1]]]) 
+                    c = np.array([[vertices[0, i-1]], [vertices[1, i-1]  - 0.02], [vertices[2, i-1]]]) 
                 circ_path = circular_path(pi, pf, c,  Ts)
                 print("Pi:", pi)
                 print("Pf:", pf)
@@ -488,7 +488,7 @@ if __name__ == '__main__':
         vertices_ur_base = apply_transformation(optitrack_to_link0_hom_trans, vertices)
 
         # safety reasons
-        vertices_ur_base[2,:] += 0.05
+        vertices_ur_base[2,:] += 0.02
 
         overall_data = np.append((overall_data), np.transpose(vertices))
         overall_data = np.reshape(overall_data,(int(len(overall_data)/3),3))
