@@ -302,8 +302,10 @@ def mixed_vertices(vertices, path, motion_sequence):
                 if i == 2:
                     c = np.array([[vertices[0, i-1]], [vertices[1, i-1]  + radius], [vertices[2, i-1]]])
                 else:
-                    c = np.array([[vertices[0, i-1]], [vertices[1, i-1]  - 0.02], [vertices[2, i-1]]]) 
+                    c = np.array([[vertices[0, i-1]], [vertices[1, i-1]  - 0.016], [vertices[2, i-1]]]) 
                 circ_path = circular_path(pi, pf, c,  Ts)
+                print("###############Read here")
+                print("C", c)
                 print("Pi:", pi)
                 print("Pf:", pf)
                 print("Path:", circ_path)

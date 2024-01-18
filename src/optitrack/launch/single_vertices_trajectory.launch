@@ -2,7 +2,7 @@
 <launch>
 
   <node name="Rosbag_record" pkg="optitrack" type="rosbag_single_vertex.py" respawn="false" output="screen">
-    <param name="folder_name" value="vertex_mix_demo"/>
+    <param name="folder_name" value="vertex_mix_cont"/>
     <param name="num_vertices" type="int" value="6"/>
 
   </node>

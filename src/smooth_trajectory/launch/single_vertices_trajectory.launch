@@ -8,7 +8,7 @@
     <param name="show_all_vertices_plot" type="bool" value="true"/>
     <param name="csv_ref_name" value="ref_pointer.csv"/>
     <param name="vertices_name" value="vertices_pointer.csv"/>
-    <param name="circ_radius" type="double" value="0.035"/>  <!-- 0.065 0.025-->
+    <param name="circ_radius" type="double" value="0.031"/>  <!-- 0.065 0.025-->
     <param name="vertices_num" type="int" value="6"/>  
 
   </node>
