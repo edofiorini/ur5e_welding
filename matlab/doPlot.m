@@ -2,16 +2,16 @@
 clear all; close all; clc;
 
 % import data
-robot_pointer_csv_name = 'robot_clothoids.csv';
-ref_pointer_csv_name = 'ref_clothoids.csv';
-vertices_pointer_csv_name = 'vertices_clothoids.csv';
+robot_pointer_csv_name = 'paper_csv/robot_clothoids.csv';
+ref_pointer_csv_name = 'paper_csv/ref_clothoids.csv';
+vertices_pointer_csv_name = 'paper_csv/vertices_clothoids.csv';
 
 
-robot_complete_csv_name = 'robot_complete.csv'; 
-ref_complete_csv_name = 'ref_complete_mix.csv';
-vertices_complete_csv_name = 'vertices_complete_mix.csv';
+robot_complete_csv_name = 'paper_csv/robot_complete.csv'; 
+ref_complete_csv_name = 'paper_csv/ref_complete_mix.csv';
+vertices_complete_csv_name = 'paper_csv/vertices_complete_mix.csv';
 
-manual_name = 'robot_manual.csv';
+manual_name = 'paper_csv/robot_manual.csv';
 robot_manual_csvFilePath = strcat('/home/saras/Workspace/ur5e_welding/src/smooth_trajectory/src/csv/', manual_name);
 
 % Specify the path to your CSV file
@@ -38,6 +38,9 @@ manual_data = csvread(robot_manual_csvFilePath, 1, 0);
 manual_x = manual_data(:, 2);
 manual_y = manual_data(:, 3);
 
+manual_x = manual_x - manual_x(1,1);
+manual_y = manual_y - manual_y(1,1);
+
 % Extract x, y, and z values
 robot_pointer_x = robot_pointer_data(:, 2);
 robot_pointer_y = robot_pointer_data(:, 3);
@@ -48,6 +51,10 @@ robot_pointer_x = robot_pointer_x(500:end,:);
 robot_pointer_y = robot_pointer_y(500:end,:);
 robot_pointer_z = robot_pointer_z(500:end,:);
 
+robot_pointer_x = robot_pointer_x - robot_pointer_x(1,1);
+robot_pointer_y = robot_pointer_y - robot_pointer_y(1,1);
+robot_pointer_z = robot_pointer_z(1,1);
+
 robot_complete_x = robot_complete_data(:, 2);
 robot_complete_y = robot_complete_data(:, 3);
 robot_rec_z = robot_complete_data(:, 4);
@@ -55,6 +62,10 @@ robot_rec_z = robot_complete_data(:, 4);
 robot_complete_x = robot_complete_x(140:end,:);
 robot_complete_y = robot_complete_y(140:end,:);
 robot_complete_z = robot_rec_z(140:end,:);
+
+robot_complete_x = robot_complete_x - robot_complete_x(1,1);
+robot_complete_y = robot_complete_y - robot_complete_y(1,1);
+robot_complete_z = robot_complete_z(1,1);
 
 % Extract x, y, and z values
 ref_pointer_x = ref_pointer_data(:, 1);
@@ -78,6 +89,9 @@ ref_complete_z = ref_rec_z(20:end,:);
 vert_pointer_x = vert_pointer_data(:, 1);
 vert_pointer_y = vert_pointer_data(:, 2);
 vert_z = vert_pointer_data(:, 3);
+
+vert_pointer_x = vert_pointer_x - vert_pointer_x(1,1);
+vert_pointer_y = vert_pointer_y - vert_pointer_y(1,1);
 %vert_pointer_x(3,1) = vert_pointer_x(3,1) + 0.002;
 %vert_pointer_x(6,1) = vert_pointer_x(6,1) - 0.002899;
 
@@ -87,6 +101,8 @@ vert_rec_z = vert_complete_data(:, 3);
 vert_complete_x(3,1) = vert_complete_x(3,1) + 0.001;
 vert_complete_x(6,1) = vert_complete_x(6,1) - 0.003;
 
+vert_complete_x = vert_complete_x - vert_complete_x(1,1);
+vert_complete_y = vert_complete_y - vert_complete_y(1,1);
 
 % color definition
 LineWidth_size = 1;
@@ -104,14 +120,14 @@ hold on;
 % pointer method
 plot(robot_pointer_x, robot_pointer_y, '.', 'Color', robot_pointer, 'Linewidth', LineWidth_size);
 hold on;
-plot(ref_pointer_x, ref_pointer_y, '.', 'Color', ref_pointer, 'Linewidth', LineWidth_size);
+%plot(ref_pointer_x, ref_pointer_y, '.', 'Color', ref_pointer, 'Linewidth', LineWidth_size);
 hold on;
 scatter(vert_pointer_x, vert_pointer_y,'.', 'Color', vert_pointer, 'Linewidth', LineWidth_size);
 hold on;
 % complete line method
 plot(robot_complete_x, robot_complete_y, '.', 'Color', robot_complete, 'Linewidth', LineWidth_size);
 hold on;
-plot(ref_complete_x, ref_complete_y, '.', 'Color', ref_complete, 'Linewidth', LineWidth_size);
+%plot(ref_complete_x, ref_complete_y, '.', 'Color', ref_complete, 'Linewidth', LineWidth_size);
 hold on;
 
 scatter(vert_complete_x, vert_complete_y,'.', 'Color', vert_complete, 'Linewidth', LineWidth_size);
@@ -124,8 +140,8 @@ scatter(manual_x(900:end,:), manual_y(900:end, :), '.', 'Color', 'green', 'Linew
 axis equal
 xlabel('X');
 ylabel('Y');
-legend('Robot Pose clothoids', 'Reference Pose clothoids', 'Vertices clothoids', 'Robot Pose complete line', 'Reference Pose complete line', 'Vertices complete line', 'Manual');
+legend('Robot Pose clothoids', 'Vertices clothoids', 'Robot Pose complete line', 'Vertices complete line', 'Manual');
 title('Welding Trajectory');
 
-saveName = fullfile('.', strcat('results/plot', '.eps'));
+saveName = fullfile('.', strcat('plot', '.eps'));
 eval(['print -painters -depsc ' saveName]);
